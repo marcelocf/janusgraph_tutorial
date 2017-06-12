@@ -50,4 +50,14 @@ I wrote this guide after trying to find my way through this technology. I had to
 
 JanusGraph has proven to be a solid and reliable solution to our project and I hope this guide is useful for you.
 
+## Scope
 
+On this tutorial we will build the backend database of a twitter clone. The sections are divided into:
+
+1. basic schema
+1. data loading
+1. querying
+1. indexing for performance
+1. hadoop integration
+
+By the end of this tutorial you should be able to design your own database backend using JanusGraph.
