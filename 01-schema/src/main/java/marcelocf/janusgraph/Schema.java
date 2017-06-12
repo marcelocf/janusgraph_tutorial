@@ -1,12 +1,11 @@
 
 package marcelocf.janusgraph;
 
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.janusgraph.core.JanusGraph;
-import org.janusgraph.core.JanusGraphFactory;
-import org.janusgraph.core.PropertyKey;
-import org.janusgraph.core.VertexLabel;
+import org.janusgraph.core.*;
 import org.janusgraph.core.schema.JanusGraphManagement;
+import org.janusgraph.core.schema.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +59,8 @@ public class Schema {
 
 
     schema.createUserSchema();
-    // build content schema
-    // build post edge
-    // build follows edge
+    schema.createStatusUpdateSchema();
+    schema.createEdgeSchema();
 
     schema.close();
   }
@@ -98,13 +96,52 @@ public class Schema {
   }
 
   /**
-   * Create the user schema - vertex label and properties and index.
+   * Create the user schema - vertex label, property and index.
    */
   private void createUserSchema(){
     VertexLabel user = mgt.makeVertexLabel(USER).make();
-    PropertyKey userName = mgt.makePropertyKey(USER_NAME).make();
+    PropertyKey userName = mgt.makePropertyKey(USER_NAME).dataType(String.class).make();
 
-    mgt.buildIndex(indexName(USER, USER_NAME), Vertex.class).addKey(userName).indexOnly(user).buildMixedIndex(BACKING_INDEX);
+    mgt.buildIndex(indexName(USER, USER_NAME), Vertex.class).
+        addKey(userName).
+        indexOnly(user).
+        buildMixedIndex(BACKING_INDEX);
+  }
+
+  /**
+   * Create the statusUpdate schema - vertex label, property and full-text index.
+   */
+  private void createStatusUpdateSchema(){
+    VertexLabel statusUpdate = mgt.makeVertexLabel(STATUS_UPDATE).make();
+    PropertyKey content = mgt.makePropertyKey(CONTENT).dataType(String.class).make();
+
+    mgt.buildIndex(indexName(STATUS_UPDATE, CONTENT), Vertex.class).
+        addKey(content, Mapping.TEXT.asParameter()).
+        indexOnly(statusUpdate).
+        buildMixedIndex(BACKING_INDEX);
+  }
+
+
+  /**
+   * Create both <i>posts</i> and <i>follows</i> edges and related index.
+   * <br/>
+   *
+   * Because the property and index for both follows and posts is the same we create them at the same point here.
+   */
+  private void createEdgeSchema() {
+    EdgeLabel posts = mgt.makeEdgeLabel(POSTS).make();
+    EdgeLabel follows = mgt.makeEdgeLabel(FOLLOWS).make();
+    PropertyKey createdAt = mgt.makePropertyKey(CREATED_AT).dataType(Long.class).make();
+
+    mgt.buildIndex(indexName(POSTS, CREATED_AT), Edge.class).
+        addKey(createdAt).
+        indexOnly(posts).
+        buildMixedIndex(BACKING_INDEX);
+
+    mgt.buildIndex(indexName(FOLLOWS, CREATED_AT), Edge.class).
+        addKey(createdAt).
+        indexOnly(follows).
+        buildMixedIndex(BACKING_INDEX);
   }
 
   /**
@@ -116,7 +153,14 @@ public class Schema {
   }
 
 
-  private String indexName(String label, String propertyKey) {
+  /**
+   * We are using this to create predictable names for our indexes. You could name it however you want, but doing
+   * like this will make it possible to reindex stuff in the future... if we want (we do want, btw)
+   * @param label edge or vertex label
+   * @param propertyKey property key
+   * @return
+   */
+  public String indexName(String label, String propertyKey) {
     return label + ":by:" + propertyKey;
   }
 }
