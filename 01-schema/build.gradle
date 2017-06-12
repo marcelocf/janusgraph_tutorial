@@ -40,12 +40,12 @@ dependencies {
   compile 'org.apache.tinkerpop:gremlin-driver:3.2.3'
   compile 'org.apache.tinkerpop:hadoop-gremlin:3.2.3'
   compile 'org.apache.tinkerpop:spark-gremlin:3.2.3'
-  compile 'org.janusgraph:janusgraph-core:0.1.1'
-  compile 'org.janusgraph:janusgraph-hadoop:0.1.1'
-  compile 'org.janusgraph:janusgraph-hadoop-core:0.1.1'
-  compile 'org.janusgraph:janusgraph-hadoop-2:0.1.1'
-  compile 'org.janusgraph:janusgraph-cassandra:0.1.1'
-  compile 'org.janusgraph:janusgraph-es:0.1.1'
+  compile 'org.janusgraph:janusgraph-core:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop-core:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop-2:0.1.0'
+  compile 'org.janusgraph:janusgraph-cassandra:0.1.0'
+  compile 'org.janusgraph:janusgraph-es:0.1.0'
 }
 
 
