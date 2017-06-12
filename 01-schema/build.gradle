@@ -49,21 +49,7 @@ dependencies {
 }
 
 
-task zip(type: Zip) {
-    from configurations.runtime.allArtifacts.files
-    from configurations.runtime
-    into 'janus_tutorial'
-}
-
-
-def logSettings = ['-Dlog4j.configuration=conf/log4j.properties']
-
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.Schema'
 applicationName = 'schema'
-applicationDefaultJvmArgs = logSettings + ['-Xms1G', '-Xmx2G']
 
-
-applicationDistribution.from('conf') {
-  into 'conf'
-}
