@@ -61,3 +61,7 @@ On this tutorial we will build the backend database of a twitter clone. The sect
 1. hadoop integration
 
 By the end of this tutorial you should be able to design your own database backend using JanusGraph.
+
+
+
+TODO: https://looksok.wordpress.com/2014/07/12/compile-gradle-project-with-another-project-as-a-dependency/
