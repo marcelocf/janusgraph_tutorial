@@ -62,6 +62,10 @@ On this tutorial we will build the backend database of a twitter clone. The sect
 
 By the end of this tutorial you should be able to design your own database backend using JanusGraph.
 
+## Code
+
+Every code depends on the main schema class. This is a design decision to reuse code and have more consistency in naming. Also, by doing so, we avoid usage of hard coded Strings as much as possible.
+
 
 
 TODO: https://looksok.wordpress.com/2014/07/12/compile-gradle-project-with-another-project-as-a-dependency/
