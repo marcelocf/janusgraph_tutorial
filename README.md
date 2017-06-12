@@ -66,6 +66,6 @@ By the end of this tutorial you should be able to design your own database backe
 
 Every code depends on the main schema class. This is a design decision to reuse code and have more consistency in naming. Also, by doing so, we avoid usage of hard coded Strings as much as possible.
 
+Also, every code loads the configuration from the [conf](conf) folder. It forces you to run the code from a specific folder in order to locate the file, but makes it a lot easier to maintain this code.
 
-
-TODO: https://looksok.wordpress.com/2014/07/12/compile-gradle-project-with-another-project-as-a-dependency/
+To ease your life, there is a simple shell script in each section called `run.sh`. This will build and evoke the example code for you.
