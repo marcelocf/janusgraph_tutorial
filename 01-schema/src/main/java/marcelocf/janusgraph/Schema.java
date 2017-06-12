@@ -6,6 +6,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.*;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.schema.Mapping;
+import org.janusgraph.diskstorage.configuration.ReadConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,14 @@ public class Schema {
    * Here we just use the same as JanusGraph.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(Schema.class);
+
+  /**
+   * The configuration file path relative to the execute path of this code.
+   * <br/>
+   *
+   * It is assumed you will run within the distributions folder.
+   */
+  public static final String CONFIG_FILE = "../../../../conf/janusgraph.properties";
 
   /**
    * The index backend is identified by a key in the configuration; in our example we called it
@@ -55,7 +64,7 @@ public class Schema {
    */
   public static void main(String[] argv) {
     // conect the graph
-    Schema schema = new Schema("conf/janusgraph.properties");
+    Schema schema = new Schema(CONFIG_FILE);
 
 
     schema.createUserSchema();
