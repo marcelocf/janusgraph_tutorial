@@ -4,12 +4,12 @@
 This is a hands on guide for JanusGraph. It is organized in sections (each folder is an independent project with a section) and it is expected you follow each guide in order.
 
 
-Every code here assumes you are running JanusGraph 0.1.1 locally. To accomplish this, run the commands:
+Every code here assumes you are running JanusGraph 0.1.0 locally. To accomplish this, run the commands:
 
 ```bash
-$ wget https://github.com/JanusGraph/janusgraph/releases/download/v0.1.1/janusgraph-0.1.1-hadoop2.zip
-$ unzip janusgraph-0.1.1-hadoop2.zip 
-$ cd janusgraph-0.1.1-hadoop2/
+$ wget https://github.com/JanusGraph/janusgraph/releases/download/v0.1.0/janusgraph-0.1.0-hadoop2.zip
+$ unzip janusgraph-0.1.0-hadoop2.zip 
+$ cd janusgraph-0.1.0-hadoop2/
 $ ./bin/janusgraph.sh start
 ```
 
