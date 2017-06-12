@@ -50,6 +50,8 @@ I wrote this guide after trying to find my way through this technology. I had to
 
 JanusGraph has proven to be a solid and reliable solution to our project and I hope this guide is useful for you.
 
+This is by no means a complete guide to JanusGraph. But I believe that following this using the [official documentation](http://docs.janusgraph.org/latest/) as a reference is enough framework for you to really dive into this technology.
+
 ## Scope
 
 On this tutorial we will build the backend database of a twitter clone. The sections are divided into:
