@@ -111,7 +111,7 @@ public class Schema {
     PropertyKey userName = mgt.makePropertyKey(USER_NAME).dataType(String.class).make();
 
     mgt.buildIndex(indexName(USER, USER_NAME), Vertex.class).
-        addKey(userName).
+        addKey(userName, Mapping.STRING.asParameter()).
         indexOnly(user).
         buildMixedIndex(BACKING_INDEX);
   }
