@@ -4,7 +4,7 @@
 
 
 JANUS_VERSION=0.1.0
-WORKDIR="$(dirname $0)/work"
+WORKDIR="$(realpath `dirname $0`)/work"
 
 JDIR=janusgraph-${JANUS_VERSION}-hadoop2
 PKGNAME=${JDIR}.zip
@@ -19,13 +19,13 @@ function download_janus(){
   echo Downloading janus
   mkdir -p $WORKDIR
   cd "$WORKDIR"
-  wget  https://github.com/JanusGraph/janusgraph/releases/download/v${JANUS_VERSION}/${PKGNAME}
+  wget -c https://github.com/JanusGraph/janusgraph/releases/download/v${JANUS_VERSION}/${PKGNAME}
   echo Extracting
   unzip -o -q $PKGNAME
 }
 
 
-janus_exist || download_janus
+janus_exists || download_janus
 
 echo starting janus
 cd "$JPATH" && ./bin/janusgraph.sh start
