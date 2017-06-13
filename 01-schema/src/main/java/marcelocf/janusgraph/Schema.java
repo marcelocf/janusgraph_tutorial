@@ -156,6 +156,8 @@ public class Schema {
    * Commit the current transaction and close the graph.
    */
   private void close(){
+    // we need to commit the Management changes or else they are not applied.
+    mgt.commit();
     graph.tx().commit();
     graph.close();
   }

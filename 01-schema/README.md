@@ -105,3 +105,14 @@ Notice how we are using the `Long` type for our property key. Timestamps must be
 Here we will be using the `Timestamp.getTime()` from Java as timestamp. In your app you can user whatever and maybe Integer might even be more appropriate for you.
 
 Notice also that we created 2 different indexes - one for `posts` and other for `follows`. We do this for performance, at cost of complexity in your schema.
+
+
+### Commit
+
+Lastly, we need to commit the management changes and close our graph:
+
+```java
+    mgt.commit();
+    graph.tx().commit();
+    graph.close();
+```
