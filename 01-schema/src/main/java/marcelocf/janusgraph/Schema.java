@@ -99,7 +99,9 @@ public class Schema {
    * @param configFile
    */
   public Schema(String configFile) {
+    LOGGER.info("Connecting graph");
     graph = JanusGraphFactory.open(configFile);
+    LOGGER.info("Getting management");
     mgt = graph.openManagement();
   }
 
@@ -107,6 +109,7 @@ public class Schema {
    * Create the user schema - vertex label, property and index.
    */
   private void createUserSchema(){
+    LOGGER.info("Create {} schema", USER);
     VertexLabel user = mgt.makeVertexLabel(USER).make();
     PropertyKey userName = mgt.makePropertyKey(USER_NAME).dataType(String.class).make();
 
@@ -114,19 +117,22 @@ public class Schema {
         addKey(userName, Mapping.STRING.asParameter()).
         indexOnly(user).
         buildMixedIndex(BACKING_INDEX);
+    mgt.commit();
   }
 
   /**
    * Create the statusUpdate schema - vertex label, property and full-text index.
    */
   private void createStatusUpdateSchema(){
+    LOGGER.info("Create {} schema", STATUS_UPDATE);
     VertexLabel statusUpdate = mgt.makeVertexLabel(STATUS_UPDATE).make();
     PropertyKey content = mgt.makePropertyKey(CONTENT).dataType(String.class).make();
 
     mgt.buildIndex(indexName(STATUS_UPDATE, CONTENT), Vertex.class).
-        addKey(content, Mapping.TEXT.asParameter()).
+        addKey(content, Mapping.TEXTSTRING.asParameter()).
         indexOnly(statusUpdate).
         buildMixedIndex(BACKING_INDEX);
+    mgt.commit();
   }
 
 
@@ -137,6 +143,7 @@ public class Schema {
    * Because the property and index for both follows and posts is the same we create them at the same point here.
    */
   private void createEdgeSchema() {
+    LOGGER.info("create edges schema");
     EdgeLabel posts = mgt.makeEdgeLabel(POSTS).make();
     EdgeLabel follows = mgt.makeEdgeLabel(FOLLOWS).make();
     PropertyKey createdAt = mgt.makePropertyKey(CREATED_AT).dataType(Long.class).make();
@@ -150,6 +157,7 @@ public class Schema {
         addKey(createdAt).
         indexOnly(follows).
         buildMixedIndex(BACKING_INDEX);
+    mgt.commit();
   }
 
   /**
