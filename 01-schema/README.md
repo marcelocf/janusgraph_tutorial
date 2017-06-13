@@ -57,7 +57,9 @@ Then we create our user schema:
 
 The first 2 lines of the method we are declaring the kind of information we will store. In the PropertyKey we also specify the data type. Not every class in Java is supported, however. For instance, to store timestamp there is no `Date` type support. We need to use `Long` instead. Strings are fully supported.
 
-Then we create a mixed index, which basically means the index will use the indexing backend (in our main example it is elasticsearch). Nothing big is set here, only that this string is searchable using elasticsearch and then we can do things like ordering.
+Then we create a mixed index, which basically means the index will use the indexing backend (in our main example it is elasticsearch). By setting the mapping in the addKey method we also make available string matching methods.
+
+This is a mixed index, meaning it is also stored in elastic search.
 
 ### Status Update Schema
 
@@ -69,13 +71,13 @@ The next vertex type is quite similar to user:
     PropertyKey content = mgt.makePropertyKey(CONTENT).dataType(String.class).make();
 
     mgt.buildIndex(indexName(STATUS_UPDATE, CONTENT), Vertex.class).
-        addKey(content, Mapping.TEXT.asParameter()).
+        addKey(content, Mapping.TEXTSTRING.asParameter()).
         indexOnly(statusUpdate).
         buildMixedIndex(BACKING_INDEX);
   }
 ```
 
-One big difference, however, is that the `addKey` method also receives a mapping parameter of `TEXT`. This will tell our indexing backend to support full-text search. Useful for things like tracking hashtags and the sorts.
+One big difference, however, is that the `addKey` method also receives a mapping parameter of `TEXTSTRING`. This will tell our indexing backend to support full-text search. Useful for things like tracking hashtags and the sorts.
 
 
 ### Edges Schema
