@@ -1,14 +1,15 @@
 
 package marcelocf.janusgraph;
 
-import org.apache.tinkerpop.gremlin.structure.Edge;
+import com.github.javafaker.Faker;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.janusgraph.core.*;
-import org.janusgraph.core.schema.JanusGraphManagement;
-import org.janusgraph.core.schema.Mapping;
-import org.janusgraph.diskstorage.configuration.ReadConfiguration;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * LoadData creation for our example graph db
@@ -26,32 +27,6 @@ public class LoadData {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(LoadData.class);
 
-  /**
-   * The configuration file path relative to the execute path of this code.
-   * <br/>
-   *
-   * It is assumed you will run within the distributions folder.
-   */
-  public static final String CONFIG_FILE = "../../../../conf/janusgraph.properties";
-
-  /**
-   * The index backend is identified by a key in the configuration; in our example we called it
-   * <pre>search</pre>.
-   * <br/>
-   * Saving it in a static variable so we can reuse.
-   */
-  public static final String BACKING_INDEX = "search";
-
-  public static final String USER = "user";
-  public static final String USER_NAME = "marcelocf.janusgraph.userName";
-
-  public static final String STATUS_UPDATE = "statusUpdate";
-  public static final String CONTENT = "marcelocf.janusgraph.content";
-
-  public static final String CREATED_AT = "marcelocf.janusgraph.createdAt";
-
-  public static final String POSTS = "posts";
-  public static final String FOLLOWS = "follows";
 
 
   /////////////////////
@@ -64,7 +39,19 @@ public class LoadData {
    */
   public static void main(String[] argv) {
     // conect the graph
-    LoadData loader = new LoadData(CONFIG_FILE);
+    LoadData loader = new LoadData(Schema.CONFIG_FILE);
+
+    Vertex users[] = loader.generateUsers(1000);
+    for(Vertex user: users) {
+      LOGGER.info("User {} comments:", user.value(Schema.USER_NAME).toString());
+      for(Vertex update: loader.generateStatusUpdates(user, 1000)) {
+        LOGGER.info("     -> {}", update.value(Schema.CONTENT).toString());
+      }
+    }
+
+
+
+
     loader.close();
   }
 
@@ -72,80 +59,25 @@ public class LoadData {
   // Instance Attributes //
   ////////////////////////
 
-  /**
-   * This <i>is</i> our graph database. Instead of connecting to a remote server, JanusGraph has a built-in implementation
-   * of the graph and connects to the backend and indexing databases.
-   * <br/>
-   * Of course, you can connect to a <i>gremlin server</i> in your code, so you use JanusGraph in a server mode. But this
-   * is not what we are doing here.
-   */
   private final JanusGraph graph;
 
+  private final Faker faker;
+  private final Date oneMonthAgo;
 
   /**
-   * The schema management is done by an instance of @{@link JanusGraphManagement}. This class can do other interesting
-   * stuff, such as kicking other nodes from the cluster. I recommend reading its javadocs.
-   */
-  private final JanusGraphManagement mgt;
-
-  /**
-   * Initialize the graph and the graph management interface.
+   * Initialize the graph connection.
    *
    * @param configFile
    */
   public LoadData(String configFile) {
     graph = JanusGraphFactory.open(configFile);
-    mgt = graph.openManagement();
+    faker = new Faker();
+
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.MONTH, -1);
+    oneMonthAgo = cal.getTime();
   }
 
-  /**
-   * Create the user schema - vertex label, property and index.
-   */
-  private void createUserSchema(){
-    VertexLabel user = mgt.makeVertexLabel(USER).make();
-    PropertyKey userName = mgt.makePropertyKey(USER_NAME).dataType(String.class).make();
-
-    mgt.buildIndex(indexName(USER, USER_NAME), Vertex.class).
-        addKey(userName).
-        indexOnly(user).
-        buildMixedIndex(BACKING_INDEX);
-  }
-
-  /**
-   * Create the statusUpdate schema - vertex label, property and full-text index.
-   */
-  private void createStatusUpdateSchema(){
-    VertexLabel statusUpdate = mgt.makeVertexLabel(STATUS_UPDATE).make();
-    PropertyKey content = mgt.makePropertyKey(CONTENT).dataType(String.class).make();
-
-    mgt.buildIndex(indexName(STATUS_UPDATE, CONTENT), Vertex.class).
-        addKey(content, Mapping.TEXT.asParameter()).
-        indexOnly(statusUpdate).
-        buildMixedIndex(BACKING_INDEX);
-  }
-
-
-  /**
-   * Create both <i>posts</i> and <i>follows</i> edges and related index.
-   * <br/>
-   *
-   * Because the property and index for both follows and posts is the same we create them at the same point here.
-   */
-  private void createEdgeSchema() {
-    EdgeLabel posts = mgt.makeEdgeLabel(POSTS).make();
-    EdgeLabel follows = mgt.makeEdgeLabel(FOLLOWS).make();
-    PropertyKey createdAt = mgt.makePropertyKey(CREATED_AT).dataType(Long.class).make();
-
-    mgt.buildIndex(indexName(POSTS, CREATED_AT), Edge.class).
-        addKey(createdAt).
-        indexOnly(posts).
-        buildMixedIndex(BACKING_INDEX);
-
-    mgt.buildIndex(indexName(FOLLOWS, CREATED_AT), Edge.class).
-        addKey(createdAt).
-        indexOnly(follows).
-        buildMixedIndex(BACKING_INDEX);
-  }
 
   /**
    * Commit the current transaction and close the graph.
@@ -156,14 +88,54 @@ public class LoadData {
   }
 
 
+  private Vertex[] generateUsers(int count){
+    Vertex[] users = new Vertex[count];
+
+    for(int i=0; i < count; i++){
+      users[i] = addUser("testUser" + i);
+    }
+
+    return users;
+  }
+
+  private Vertex[] generateStatusUpdates(Vertex user, int count){
+    Vertex[] updates = new Vertex[count];
+    for(int i=0; i < count; i++) {
+      updates[i] = addStatusUpdatew(user, getContent());
+    }
+    return updates;
+  }
+
+
   /**
-   * We are using this to create predictable names for our indexes. You could name it however you want, but doing
-   * like this will make it possible to reindex stuff in the future... if we want (we do want, btw)
-   * @param label edge or vertex label
-   * @param propertyKey property key
+   * Add a user vertex
+   * @param userName username for this user
+   * @return the created vertex
+   */
+  private Vertex addUser(String userName){
+    Vertex user = graph.addVertex(Schema.USER);
+    user.property(Schema.USER_NAME, userName);
+    return user;
+  }
+
+  private Vertex addStatusUpdatew(Vertex user, String statusUpdateContent) {
+    Vertex statusUpdate = graph.addVertex(Schema.STATUS_UPDATE);
+    statusUpdate.property(Schema.CONTENT, statusUpdateContent);
+    user.addEdge(Schema.POSTS, statusUpdate, Schema.CREATED_AT, getTimestamp());
+    return statusUpdate;
+  }
+
+
+  /**
+   * Return a timestamp between 1 month ago and now.
    * @return
    */
-  public String indexName(String label, String propertyKey) {
-    return label + ":by:" + propertyKey;
+  private Long getTimestamp(){
+    return faker.date().between(oneMonthAgo, new Date()).getTime();
   }
+
+  private String getContent(){
+    return faker.chuckNorris().fact();
+  }
+
 }
