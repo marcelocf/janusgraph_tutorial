@@ -1,10 +1,26 @@
 # JanusGraph tutorial
 
+**NOTE:** it goes without saying that you need a properly configured JDK in your environment.
+
 
 This is a hands on guide for JanusGraph. It is organized in sections (each folder is an independent project with a section) and it is expected you follow each guide in order.
 
 
-Every code here assumes you are running JanusGraph 0.1.0 locally. To accomplish this, run the commands:
+## Starging Janus Graph
+
+Every code here assumes you are running JanusGraph 0.1.0 locally.
+
+### For the lazy
+
+You should be ashamed. BUT, here is a shortcut:
+
+```bash
+./start_janus.sh
+```
+
+### For the ones that want to really learn stuff
+
+This is fairly simple; just download janus and tell it to start up.
 
 ```bash
 $ wget https://github.com/JanusGraph/janusgraph/releases/download/v0.1.0/janusgraph-0.1.0-hadoop2.zip
