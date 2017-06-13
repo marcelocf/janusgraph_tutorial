@@ -28,4 +28,22 @@ function download_janus(){
 janus_exists || download_janus
 
 echo starting janus
+# make sure it is not running first
+cd "$JPATH" && ./bin/janusgraph.sh stop
 cd "$JPATH" && ./bin/janusgraph.sh start
+
+
+
+cat << EOF
+
+
+=================================================
+|| JanusGraph should be running now!           ||
+||                                             ||
+|| Go ahead and try the code in this tutorial! ||
+||                                             ||
+|| I hope you have fun learning.               ||
+||                                             ||
+||                          Marcelo C. Freitas ||
+=================================================
+EOF
