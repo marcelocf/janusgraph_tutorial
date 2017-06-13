@@ -6,7 +6,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.*;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.schema.Mapping;
-import org.janusgraph.diskstorage.configuration.ReadConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,6 +2,7 @@
 package marcelocf.janusgraph;
 
 import com.github.javafaker.Faker;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
@@ -38,19 +39,23 @@ public class LoadData {
    * @param argv
    */
   public static void main(String[] argv) {
-    // conect the graph
     LoadData loader = new LoadData(Schema.CONFIG_FILE);
 
     Vertex users[] = loader.generateUsers(1000);
+    loader.commit();
     for(Vertex user: users) {
       LOGGER.info("User {} comments:", user.value(Schema.USER_NAME).toString());
       for(Vertex update: loader.generateStatusUpdates(user, 1000)) {
         LOGGER.info("     -> {}", update.value(Schema.CONTENT).toString());
       }
+      loader.commit();
+
+      LOGGER.info("User {} follows:", user.value(Schema.USER_NAME).toString());
+      for(Vertex followedUser: loader.generateFollows(user, users, 50)) {
+        LOGGER.info("     -> {}", followedUser.value(Schema.USER_NAME).toString());
+      }
+      loader.commit();
     }
-
-
-
 
     loader.close();
   }
@@ -79,11 +84,15 @@ public class LoadData {
   }
 
 
+  private void commit(){
+    graph.tx().commit();
+  }
+
   /**
    * Commit the current transaction and close the graph.
    */
   private void close(){
-    graph.tx().commit();
+    commit();
     graph.close();
   }
 
@@ -125,6 +134,15 @@ public class LoadData {
     return statusUpdate;
   }
 
+  private Vertex[] generateFollows(Vertex forUser, Vertex[] users, int count){
+    Vertex[] followedUsers = new Vertex[count];
+
+    for(int i = 0; i < count; i++) {
+      followedUsers[i] = users[faker.number().numberBetween(0, users.length - 1)];
+      Edge follows = forUser.addEdge(Schema.FOLLOWS, followedUsers[i], Schema.CREATED_AT, getTimestamp());
+    }
+    return followedUsers;
+  }
 
   /**
    * Return a timestamp between 1 month ago and now.
