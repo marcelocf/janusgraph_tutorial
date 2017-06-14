@@ -117,7 +117,6 @@ public class Schema {
         addKey(userName, Mapping.STRING.asParameter()).
         indexOnly(user).
         buildMixedIndex(BACKING_INDEX);
-    mgt.commit();
   }
 
   /**
@@ -132,7 +131,6 @@ public class Schema {
         addKey(content, Mapping.TEXTSTRING.asParameter()).
         indexOnly(statusUpdate).
         buildMixedIndex(BACKING_INDEX);
-    mgt.commit();
   }
 
 
@@ -157,7 +155,6 @@ public class Schema {
         addKey(createdAt).
         indexOnly(follows).
         buildMixedIndex(BACKING_INDEX);
-    mgt.commit();
   }
 
   /**
