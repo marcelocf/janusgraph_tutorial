@@ -12,6 +12,8 @@ import java.util.Map;
 
 import static marcelocf.janusgraph.Schema.USER_NAME;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.not;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.without;
 
 public class QueryRunner {
 
@@ -45,7 +47,7 @@ public class QueryRunner {
   }
 
   public GraphTraversal<Vertex, Vertex> getFollowers() {
-    return getUser().in(Schema.FOLLOWS);
+    return getUser().aggregate("ignore").in(Schema.FOLLOWS);
   }
 
   public GraphTraversal<Vertex, Vertex> getFollowersOfFollowedUsers() {
@@ -53,6 +55,14 @@ public class QueryRunner {
   }
 
   public GraphTraversal<Vertex, Vertex> getFollowRecommendation(){
-    return getFollowersOfFollowedUsers();
+    return getUser().
+        aggregate("me").
+        aggregate("ignore").
+        out(Schema.FOLLOWS).
+        aggregate("ignore").
+        cap("me").
+        unfold().
+        in(Schema.FOLLOWS).
+        where(without("ignore"));
   }
 }

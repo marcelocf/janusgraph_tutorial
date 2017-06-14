@@ -45,17 +45,50 @@ This query can then be iterated using `hasNext()` and `next()` methods.
 
 
 
+**NOTE:** from now own, whenever we use `getUser` it means the result of this query!
+
+
 
 ## Getting user status update
 
 ```java
-:
+return getUser().out(Schema.POSTS);
 ```
 
 ## Getting followed users
 
+```java
+return getUser().out(Schema.FOLLOWS);
+```
+
 ## Getting followers
 
+```java
+return getUser().in(Schema.FOLLOWS);
+```
+
+
+## Getting Followers of users a specific user follows
+
+```java
+return getUser().out(Schema.FOLLOWS).in(Schema.FOLLOWS);
+```
+
 ## Recommending users
+
+We want to recommend users as long our user is not following them; and we don't want to recommend our specific user to him again.
+
+```java
+return getUser().
+        aggregate("me").
+        aggregate("ignore").
+        out(Schema.FOLLOWS).
+        aggregate("ignore").
+        cap("me").
+        unfold().
+        in(Schema.FOLLOWS).
+        where(without("ignore"));
+```
+
 
 ## Building a timeline
