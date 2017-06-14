@@ -52,4 +52,4 @@ dependencies {
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.Schema'
 applicationName = 'schema'
-
+applicationDefaultJvmArgs = ['-Dlog4j.configuration=log4j.properties']

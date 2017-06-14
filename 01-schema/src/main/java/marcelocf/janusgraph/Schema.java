@@ -31,7 +31,7 @@ public class Schema {
    *
    * It is assumed you will run within the distributions folder.
    */
-  public static final String CONFIG_FILE = "../../../../conf/janusgraph.properties";
+  public static final String CONFIG_FILE = "conf/janusgraph.properties";
 
   /**
    * The index backend is identified by a key in the configuration; in our example we called it

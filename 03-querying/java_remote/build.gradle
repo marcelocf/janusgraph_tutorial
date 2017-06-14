@@ -67,7 +67,7 @@ def logSettings = ['-Dlog4j.configuration=log4j.properties']
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.RemoteQueries'
 applicationName = 'java_remote'
-applicationDefaultJvmArgs = logSettings
+applicationDefaultJvmArgs = ['-Dlog4j.configuration=log4j.properties']
 
 
 applicationDistribution.from('conf') {
