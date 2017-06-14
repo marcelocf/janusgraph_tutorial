@@ -61,7 +61,8 @@ task zip(type: Zip) {
 }
 
 
-def logSettings = ['-Dlog4j.configuration=../../../../../conf/log4j.properties']
+def logSettings = ['-Dlog4j.configuration=conf/log4j.properties']
+//def logSettings = ['-Dlog4j.configuration=../../../../../conf/log4j.properties']
 
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.RemoteQueries'

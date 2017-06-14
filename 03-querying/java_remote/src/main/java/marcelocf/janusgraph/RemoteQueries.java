@@ -15,7 +15,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
 
 public class RemoteQueries {
 
-  public static final String CONFIG_FILE = "../../../../../conf/janusgraph-remote.properties";
+  public static final String CONFIG_FILE = "conf/janusgraph-remote.properties";
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoteQueries.class);
   private final Graph graph;
   private final GraphTraversalSource g;
@@ -30,16 +30,16 @@ public class RemoteQueries {
     RemoteQueries remoteQueries = new RemoteQueries();
     String userName = "testUser0";
 
-    System.out.println("Initialized the remote query executor");
+    LOGGER.info("Initialized the remote query executor");
 
 
-    System.out.println("Getting user:");
+    LOGGER.info("Getting user:");
     print(remoteQueries.getUser(userName));
 
-    System.out.println("Getting followed users");
+    LOGGER.info("Getting followed users");
     print(remoteQueries.getFollowedUsers(userName));
 
-    System.out.println("Getting followers users");
+    LOGGER.info("Getting followers users");
     print(remoteQueries.getFollowers(userName));
 
     remoteQueries.close();
@@ -57,7 +57,6 @@ public class RemoteQueries {
     for (GraphTraversal<Vertex, Map<String, Object>> it = valueMap; it.hasNext(); ) {
       Map<String, Object> item = it.next();
       LOGGER.info(" {}: {} ", count++, item.toString());
-      System.out.println(item.toString());
     }
     LOGGER.info("Printed {} element(s)", count);
   }
