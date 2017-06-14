@@ -82,8 +82,28 @@ By the end of this tutorial you should be able to design your own database backe
 
 ## Code
 
-Every code depends on the main schema class. This is a design decision to reuse code and have more consistency in naming. Also, by doing so, we avoid usage of hard coded Strings as much as possible.
-
-Also, every code loads the configuration from the [conf](conf) folder. It forces you to run the code from a specific folder in order to locate the file, but makes it a lot easier to maintain this code.
+Every Java code depends on the main schema class. This is a design decision to reuse code and have more consistency in naming. Also, by doing so, we avoid usage of hard coded Strings as much as possible.
 
 To ease your life, there is a simple shell script in each section called `run.sh`. This will build and evoke the example code for you.
+
+### Java
+
+We are using the standard gradle application plugin naming conventions on Java projects; this means that we have the folders:
+
+```
+/src/main/
+  dist
+  resources
+  java
+```
+
+Inside `dist` you will find the JanusGraph configuration files. Each section has its own files. In `resources` there is the `log4j.properties` file. And `java` contains the implementation.
+
+### Ruby
+
+In our ruby example codes we are relying on:
+
+* [RVM](https://rvm.io/): for ruby version management (if you use someting different, please prepare your env).
+* bundler (`gem install bundler`): for dependency management.
+* [gremlin driver gem](https://github.com/marcelocf/gremlin_client): a really simple driver in ruby for JanusGraph.
+
