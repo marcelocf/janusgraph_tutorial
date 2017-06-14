@@ -4,7 +4,7 @@
 
 
 echo Building... && \
-  ./gradlew distZip
+  ./gradlew distZip && \
   echo Extracting  && \
   pushd build/distributions && \
   unzip -q -o java_remote && \

@@ -61,13 +61,13 @@ task zip(type: Zip) {
 }
 
 
-def logSettings = ['-Dlog4j.configuration=conf/log4j.properties']
+def logSettings = ['-Dlog4j.configuration=log4j.properties']
 //def logSettings = ['-Dlog4j.configuration=../../../../../conf/log4j.properties']
 
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.RemoteQueries'
 applicationName = 'java_remote'
-applicationDefaultJvmArgs = logSettings + ['-Xms1G', '-Xmx2G']
+applicationDefaultJvmArgs = logSettings
 
 
 applicationDistribution.from('conf') {

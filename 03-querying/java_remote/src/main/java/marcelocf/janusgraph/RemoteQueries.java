@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static marcelocf.janusgraph.Schema.USER_NAME;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.not;
 
 public class RemoteQueries {
 
@@ -19,6 +20,7 @@ public class RemoteQueries {
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoteQueries.class);
   private final Graph graph;
   private final GraphTraversalSource g;
+  private final String userName;
 
   /**
    * Run every example query, outputting results via @LOGGER
@@ -27,20 +29,22 @@ public class RemoteQueries {
    * @throws Exception
    */
   public static void main(String[] argv) throws Exception {
-    RemoteQueries remoteQueries = new RemoteQueries();
-    String userName = "testUser0";
+    RemoteQueries remoteQueries = new RemoteQueries("testUser0");
 
     LOGGER.info("Initialized the remote query executor");
 
 
     LOGGER.info("Getting user:");
-    print(remoteQueries.getUser(userName));
+    print(remoteQueries.getUser());
 
     LOGGER.info("Getting followed users");
-    print(remoteQueries.getFollowedUsers(userName));
+    print(remoteQueries.getFollowedUsers());
 
     LOGGER.info("Getting followers users");
-    print(remoteQueries.getFollowers(userName));
+    print(remoteQueries.getFollowers());
+
+    LOGGER.info("Getting followers of followed users");
+    print(remoteQueries.getFollowersOfFollowedUsers());
 
     remoteQueries.close();
     System.exit(0);
@@ -65,7 +69,8 @@ public class RemoteQueries {
   // Instance Methods //
   ///////
 
-  public RemoteQueries() throws Exception {
+  public RemoteQueries(String userName) throws Exception {
+    this.userName = userName;
     graph = EmptyGraph.instance();
     g = graph.traversal().withRemote(CONFIG_FILE);
   }
@@ -75,15 +80,23 @@ public class RemoteQueries {
     // no need to close the graph because it is an empty graph allocated only to be able to connect to a remote
   }
 
-  public GraphTraversal<Vertex, Vertex> getUser(String userName) {
+  public GraphTraversal<Vertex, Vertex> getUser() {
     return g.V().hasLabel(Schema.USER).has(USER_NAME, eq(userName));
   }
 
-  public GraphTraversal<Vertex, Vertex> getFollowedUsers(String userName) {
-    return getUser(userName).out(Schema.FOLLOWS);
+  public GraphTraversal<Vertex, Vertex> getFollowedUsers() {
+    return getUser().out(Schema.FOLLOWS);
   }
 
-  public GraphTraversal<Vertex, Vertex> getFollowers(String userName) {
-    return getUser(userName).in(Schema.FOLLOWS);
+  public GraphTraversal<Vertex, Vertex> getFollowers() {
+    return getUser().in(Schema.FOLLOWS);
+  }
+
+  public GraphTraversal<Vertex, Vertex> getFollowersOfFollowedUsers() {
+    return getFollowedUsers().in(Schema.FOLLOWS);
+  }
+
+  public GraphTraversal<Vertex, Vertex> getFollowRecommendation(){
+    return getFollowersOfFollowedUsers();
   }
 }
