@@ -2,17 +2,13 @@ package marcelocf.janusgraph;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static marcelocf.janusgraph.Schema.USER_NAME;
+import static marcelocf.janusgraph.Schema.*;
+import static org.apache.tinkerpop.gremlin.process.traversal.Order.decr;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
-import static org.apache.tinkerpop.gremlin.process.traversal.P.not;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.without;
 
 public class QueryRunner {
@@ -64,5 +60,35 @@ public class QueryRunner {
         unfold().
         in(Schema.FOLLOWS).
         where(without("ignore"));
+  }
+
+  public GraphTraversal<Vertex, Vertex> getTimeline(int limit){
+    return getUser().
+        aggregate("users").
+        out(FOLLOWS).
+        aggregate("users").
+        cap("users").
+        unfold().
+        outE(POSTS).
+        order().by(CREATED_AT, decr).
+        limit(limit).
+        inV();
+  }
+
+  public GraphTraversal<Vertex, Map<String, Object>> getTimeline2(int limit){
+    return getUser().
+        aggregate("users").
+        out(FOLLOWS).
+        aggregate("users").
+        cap("users").
+        unfold().
+        as("userss").
+        outE(POSTS).
+        as("posts").
+        order().by(CREATED_AT, decr).
+        limit(limit).
+        inV().
+        as("statusUpdates").
+        select("userss", "posts", "statusUpdates");
   }
 }

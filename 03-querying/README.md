@@ -118,3 +118,22 @@ Lastly the step `where(without("ignore"))` filters out the user and people
 already being followed.
 
 ## Building a timeline
+
+Timeline would be every post of users we follow, plus ours, ordered by creation
+date decre
+
+```java
+return getUser().
+        aggregate("users").
+        out(FOLLOWS).
+        aggregate("users").
+        cap("users").
+        unfold().
+        outE(POSTS).
+        order().by(CREATED_AT, decr).
+        limit(limit).
+        inV();
+```
+
+This works, but it returns only the posts. We also need the creation time and
+author of those posts.

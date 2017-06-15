@@ -10,10 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static marcelocf.janusgraph.Schema.USER_NAME;
-import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
-import static org.apache.tinkerpop.gremlin.process.traversal.P.not;
-
 public class RemoteQueries {
 
   ///////////////////
@@ -57,6 +53,12 @@ public class RemoteQueries {
     LOGGER.info("Getting recommendations of users to follow");
     print(queryRunner.getFollowRecommendation());
 
+    LOGGER.info("Printing timeline");
+    print(queryRunner.getTimeline(100));
+
+    LOGGER.info("Printing timeline");
+    printObject(queryRunner.getTimeline2(2));
+
     queryRunner.close();
     System.exit(0);
   }
@@ -66,6 +68,17 @@ public class RemoteQueries {
    * @param traversal
    */
   private static void print(GraphTraversal<Vertex, Vertex> traversal) {
+    GraphTraversal<Vertex, Map<String, Object>> valueMap = traversal.valueMap(true);
+    int count = 0;
+
+    for (GraphTraversal<Vertex, Map<String, Object>> it = valueMap; it.hasNext(); ) {
+      Map<String, Object> item = it.next();
+      LOGGER.info(" {}: {} ", count++, item.toString());
+    }
+    LOGGER.info("Printed {} element(s)", count);
+  }
+
+  private static void printObject(GraphTraversal<Vertex, Map<String, Object>> traversal) {
     GraphTraversal<Vertex, Map<String, Object>> valueMap = traversal.valueMap(true);
     int count = 0;
 
