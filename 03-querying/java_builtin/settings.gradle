@@ -1,0 +1,6 @@
+include ':01-schema'
+project(':01-schema').projectDir = new File(settingsDir, '../../01-schema')
+
+include ':03-querying-java_remote'
+project(':03-querying-java_remote').projectDir = new File(settingsDir, '../java_remote')
+
