@@ -55,11 +55,20 @@ This query can then be iterated using `hasNext()` and `next()` methods.
 return getUser().out(Schema.POSTS);
 ```
 
+From the user traversal, look for output edges with label `label` and return
+the connected vertices.
+
+We previously made sure the receiving end of `posts` edges are of Status
+Updates. If that was not the case we would still have to filter by label.
+
 ## Getting followed users
 
 ```java
 return getUser().out(Schema.FOLLOWS);
 ```
+
+Behaves exactly the status update query, but return other users and traverse
+through the `follows`  edges.
 
 ## Getting followers
 
@@ -67,12 +76,17 @@ return getUser().out(Schema.FOLLOWS);
 return getUser().in(Schema.FOLLOWS);
 ```
 
+Here we use the `in` step, which is the oposite of `out` used previously. It
+traverses the graph to edges of label `follows` that arrive on present node,
 
 ## Getting Followers of users a specific user follows
 
 ```java
 return getUser().out(Schema.FOLLOWS).in(Schema.FOLLOWS);
 ```
+
+Now we combine both. Notice that this query can return duplicated users. If it
+is desired to filter out duplicates, we could use the `dedup` step.
 
 ## Recommending users
 
@@ -90,5 +104,17 @@ return getUser().
         where(without("ignore"));
 ```
 
+
+The important bits are:
+
+* `aggregate` step: append the results to an alias (called sideffect) and 
+  doesn't change it when returning.
+* `cap`: emmits one or more side effects with the given aliases into a map from
+  alias to result.
+* `unfold`: receiving a map like the one from `cap`, return the results in a
+  linear form.
+
+Lastly the step `where(without("ignore"))` filters out the user and people
+already being followed.
 
 ## Building a timeline
