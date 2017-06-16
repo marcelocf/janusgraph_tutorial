@@ -1,14 +1,20 @@
+String userVertex = 'userVertex';
+String postsEdge = 'postsEdge';
+String statusUpdateVertex = 'statusUpdateEdge';
+
+String usersAggregate = 'users'
+
 g.V().hasLabel(userLabel).has(userNameProperty, userName).
-        aggregate("users").
+        aggregate(usersAggregate).
         out(followsLabel).
-        aggregate("users").
-        cap("users").
+        aggregate(usersAggregate).
+        cap(usersAggregate).
         unfold().
-        as('userVertex').
+        as(userVertex).
         outE(postsLabel).
-        as('postEdge').
+        as(postsEdge).
         order().by(createdAtProperty, decr).
         limit(10).
         inV().
-        as('statusUpdateVertex').
-        select('userVertex', 'postEdge', 'statusUpdateVertex')
+        as(statusUpdateVertex).
+        select(userVertex, postsEdge, statusUpdateVertex)

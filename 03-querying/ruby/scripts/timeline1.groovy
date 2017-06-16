@@ -1,8 +1,10 @@
+String usersAggregate = 'users'
+
 g.V().hasLabel(userLabel).has(userNameProperty, userName).
-        aggregate("users").
+        aggregate(usersAggregate).
         out(followsLabel).
-        aggregate("users").
-        cap("users").
+        aggregate(usersAggregate).
+        cap(usersAggregate).
         unfold().
         outE(postsLabel).
         order().by(createdAtProperty, decr).
