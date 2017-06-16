@@ -19,3 +19,6 @@ hs_err_pid*
 **/.idea
 **/*.iml
 work
+
+# vim
+**/.*.swp
