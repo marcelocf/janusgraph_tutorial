@@ -59,6 +59,29 @@ run_query(
   'g.V().hasLabel("user").has(userNameProperty, userName)'
 )
 
+run_query(
+  'Get status updates',
+  'g.V().hasLabel("user").has(userNameProperty, userName).out(postsLabel)'
+)
+
+run_query(
+  'Get followed users',
+  'g.V().hasLabel("user").has(userNameProperty, userName).out(followsLabel)'
+)
+
+run_query(
+  'Get followers',
+  'g.V().hasLabel("user").has(userNameProperty, userName).in(followsLabel)'
+)
+
+
+run_query(
+  'Get followers of followed users',
+  'g.V().hasLabel("user").has(userNameProperty, userName).out(followsLabel).in(followsLabel)'
+)
+
+
+
 
 ##########################
 # Using Connection Pools #
