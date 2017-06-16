@@ -32,6 +32,8 @@ public class QueryRunner {
   private final GraphTraversalSource g;
   private final String userName;
 
+  private long startedAt;
+
   public QueryRunner(GraphTraversalSource traversalSource, String userName) throws Exception {
     this.g = traversalSource;
     this.userName = userName;
@@ -137,7 +139,8 @@ public class QueryRunner {
    * Just a simple print method for every property returned from a vertex traversal
    * @param traversal
    */
-  private static void print(GraphTraversal<Vertex, Vertex> traversal) {
+  private void print(GraphTraversal<Vertex, Vertex> traversal) {
+    resetTimer();
     GraphTraversal<Vertex, Map<String, Object>> valueMap = traversal.valueMap(true);
     int count = 0;
 
@@ -145,12 +148,12 @@ public class QueryRunner {
       Map<String, Object> item = it.next();
       LOGGER.info(" {}: {} ", count++, item.toString());
     }
-    LOGGER.info("Printed {} element(s)", count);
+    LOGGER.info("Printed {} element(s) in {}ms", count, duration());
   }
 
-  private static void printTimeline(GraphTraversal<Vertex, Map<String, Map<String, Object>>> traversal) {
+  private void printTimeline(GraphTraversal<Vertex, Map<String, Map<String, Object>>> traversal) {
     int count = 0;
-
+    resetTimer();
     while (traversal.hasNext()) {
       Map<String, Map<String, Object>> item = traversal.next();
       Vertex user = (Vertex) item.get(userVertex);
@@ -164,11 +167,21 @@ public class QueryRunner {
           statusUpdate.value(CONTENT)
       );
     }
-    LOGGER.info("Printed {} element(s)", count);
+
+    LOGGER.info("Printed {} element(s) in {}ms", count, duration());
   }
 
-  private static String formatTimestamp(Long timestamp) {
+  private String formatTimestamp(Long timestamp) {
     Date d = new Date(timestamp);
     return d.toString();
+  }
+
+
+  private void resetTimer(){
+    startedAt = (new Date()).getTime();
+  }
+
+  private long duration(){
+    return (new Date()).getTime() - startedAt;
   }
 }
