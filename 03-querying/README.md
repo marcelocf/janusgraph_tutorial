@@ -137,3 +137,36 @@ return getUser().
 
 This works, but it returns only the posts. We also need the creation time and
 author of those posts.
+
+
+## Building a better timeline
+
+We need to display more info for our timeline; a way good way of doing this is
+by:
+
+```java
+    return getUser().
+        aggregate("users").
+        out(FOLLOWS).
+        aggregate("users").
+        cap("users").
+        unfold().
+        as(userVertex).
+        outE(POSTS).
+        as(postsEdge).
+        order().by(CREATED_AT, decr).
+        limit(limit).
+        inV().
+        as(statusUpdateVertex).
+        select(userVertex, postsEdge, statusUpdateVertex);
+```
+
+
+Notice a couple of things here:
+
+* the variables `userVertex`, `postsEdge` and `statusUpdateVertex` are strings
+  that declare aliases for new sideffects.
+* we use `as()`, that saves the current result into an alias.
+* then we use `select()` to retrieve those results.
+
+Now we have every bit of information we need to build a timeline.
