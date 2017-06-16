@@ -28,25 +28,29 @@ puts 'Connecting to Gremlin Server'
 $conn = GremlinClient::Connection.new
 
 
-def print(description, results)
+def print(description, results, duration)
   puts <<EOF
 ---------------------------------------------------------------------
 #{description}
 
 #{results.pretty_inspect.strip}
 ---------------------------------------------------------------------
+Duration: #{duration}s
 
 EOF
 
 end
 
 def run_query(description, query)
-  print(
-    description,
-    $conn.send_query(
+  t = Time.now
+  results = $conn.send_query(
       query,
       $bindings
     )
+  print(
+    description,
+    results,
+    Time.now - t
   )
 end
 
@@ -69,9 +73,12 @@ GremlinClient::Connection.pool =
 
 def run_pooled_query(description, filename)
   GremlinClient::Connection.pool.with do |pooled_conn|
+    t = Time.now
+    results = pooled_conn.send_file(filename, $bindings)
     print(
       description,
-      pooled_conn.send_file(filename, $bindings)
+      results,
+      Time.now - t
     )
   end
 end
