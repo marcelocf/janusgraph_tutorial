@@ -7,6 +7,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Map;
 
 import static marcelocf.janusgraph.Schema.*;
@@ -159,10 +160,15 @@ public class QueryRunner {
           " {}: @{} {}: {}",
           count++,
           user.value(USER_NAME),
-          posts.value(CREATED_AT),
+          formatTimestamp(posts.value(CREATED_AT)),
           statusUpdate.value(CONTENT)
       );
     }
     LOGGER.info("Printed {} element(s)", count);
+  }
+
+  private static String formatTimestamp(Long timestamp) {
+    Date d = new Date(timestamp);
+    return d.toString();
   }
 }
