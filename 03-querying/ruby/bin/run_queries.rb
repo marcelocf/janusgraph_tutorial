@@ -33,11 +33,12 @@ def print(description, results)
 ---------------------------------------------------------------------
 #{description}
 
-#{results.pretty_inspect}
+#{results.pretty_inspect.strip}
 ---------------------------------------------------------------------
+
 EOF
+
 end
-print(1,2)
 
 def run_query(description, query)
   print(
@@ -55,7 +56,9 @@ run_query(
 )
 
 
-# you can also use connection pools by
+##########################
+# Using Connection Pools #
+##########################
 
 GremlinClient::Connection.pool =
   ConnectionPool.new(size: 15, timeout: 10) do
@@ -64,6 +67,17 @@ GremlinClient::Connection.pool =
     );
   end
 
-GremlinClient::Connection.pool.with do |pooled_conn|
-  pp pooled_conn.send_file('follow_recommendation.groovy', $bindings)
+def run_pooled_query(description, filename)
+  GremlinClient::Connection.pool.with do |pooled_conn|
+    print(
+      description,
+      pooled_conn.send_file(filename, $bindings)
+    )
+  end
 end
+  
+
+run_pooled_query(
+  'Fetch Recommendation of Users to follow',
+  'follow_recommendation.groovy'
+)
