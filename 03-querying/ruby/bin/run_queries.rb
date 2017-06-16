@@ -81,3 +81,9 @@ run_pooled_query(
   'Fetch Recommendation of Users to follow',
   'follow_recommendation.groovy'
 )
+
+
+run_pooled_query(
+  'Timeline - only status updates',
+  'timeline1.groovy'
+)
