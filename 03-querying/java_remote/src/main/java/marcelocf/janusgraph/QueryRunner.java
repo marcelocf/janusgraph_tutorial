@@ -2,7 +2,10 @@ package marcelocf.janusgraph;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -12,6 +15,14 @@ import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.without;
 
 public class QueryRunner {
+
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(QueryRunner.class);
+
+  public static final String userVertex = "userVertex";
+  public static final String postsEdge = "postsEdge";
+  public static final String statusUpdateVertex = "statusUpdateEdge";
+
 
   ///////////////////////
   // Instance Methods //
@@ -27,7 +38,6 @@ public class QueryRunner {
 
   public void close() throws Exception {
     g.close();
-    // no need to close the graph because it is an empty graph allocated only to be able to connect to a remote
   }
 
   public GraphTraversal<Vertex, Vertex> getUser() {
@@ -75,20 +85,84 @@ public class QueryRunner {
         inV();
   }
 
-  public GraphTraversal<Vertex, Map<String, Object>> getTimeline2(int limit){
+  public GraphTraversal<Vertex, Map<String, Map<String,Object>>> getTimeline2(int limit){
     return getUser().
         aggregate("users").
         out(FOLLOWS).
         aggregate("users").
         cap("users").
         unfold().
-        as("userss").
+        as(userVertex).
         outE(POSTS).
-        as("posts").
+        as(postsEdge).
         order().by(CREATED_AT, decr).
         limit(limit).
         inV().
-        as("statusUpdates").
-        select("userss", "posts", "statusUpdates");
+        as(statusUpdateVertex).
+        select(userVertex, postsEdge, statusUpdateVertex);
+  }
+
+
+  public void runQueries() {
+
+    LOGGER.info("Getting user:");
+    print(getUser());
+
+    LOGGER.info("Getting status updates:");
+    print(getStatusUpdate());
+
+    LOGGER.info("Getting followed users");
+    print(getFollowedUsers());
+
+    LOGGER.info("Getting followers users");
+    print(getFollowers());
+
+    LOGGER.info("Getting followers of followed users");
+    print(getFollowersOfFollowedUsers());
+
+    LOGGER.info("Getting recommendations of users to follow");
+    print(getFollowRecommendation());
+
+    LOGGER.info("Printing timeline");
+    print(getTimeline(100));
+
+    LOGGER.info("Printing timeline");
+    printTimeline(getTimeline2(100));
+
+    System.exit(0);
+  }
+
+  /**
+   * Just a simple print method for every property returned from a vertex traversal
+   * @param traversal
+   */
+  private static void print(GraphTraversal<Vertex, Vertex> traversal) {
+    GraphTraversal<Vertex, Map<String, Object>> valueMap = traversal.valueMap(true);
+    int count = 0;
+
+    for (GraphTraversal<Vertex, Map<String, Object>> it = valueMap; it.hasNext(); ) {
+      Map<String, Object> item = it.next();
+      LOGGER.info(" {}: {} ", count++, item.toString());
+    }
+    LOGGER.info("Printed {} element(s)", count);
+  }
+
+  private static void printTimeline(GraphTraversal<Vertex, Map<String, Map<String, Object>>> traversal) {
+    int count = 0;
+
+    while (traversal.hasNext()) {
+      Map<String, Map<String, Object>> item = traversal.next();
+      Vertex user = (Vertex) item.get(userVertex);
+      Edge posts = (Edge) item.get(postsEdge);
+      Vertex statusUpdate = (Vertex) item.get(statusUpdateVertex);
+      LOGGER.info(
+          " {}: @{} {}: {}",
+          count++,
+          user.value(USER_NAME),
+          posts.value(CREATED_AT),
+          statusUpdate.value(CONTENT)
+      );
+    }
+    LOGGER.info("Printed {} element(s)", count);
   }
 }
