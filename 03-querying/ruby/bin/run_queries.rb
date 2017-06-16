@@ -94,3 +94,9 @@ run_pooled_query(
   'Timeline - only status updates',
   'timeline1.groovy'
 )
+
+
+run_pooled_query(
+  'Timeline - relevant data',
+  'timeline2.groovy'
+)
