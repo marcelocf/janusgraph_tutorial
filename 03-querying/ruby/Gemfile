@@ -1,5 +1,7 @@
-# frozen_string_literal: true
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "gremlin_client", "~> 0.1.5"
+ruby '2.3.1'
+
+gem 'gremlin_client', '~> 0.1.5'
+gem 'connection_pool', '~> 2.2', '>= 2.2.1'
 

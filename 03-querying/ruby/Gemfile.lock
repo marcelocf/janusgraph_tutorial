@@ -1,0 +1,26 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    connection_pool (2.2.1)
+    event_emitter (0.2.5)
+    gremlin_client (0.1.5)
+      oj (~> 2.16)
+      websocket-client-simple (~> 0.3)
+    oj (2.18.5)
+    websocket (1.2.4)
+    websocket-client-simple (0.3.0)
+      event_emitter
+      websocket
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  connection_pool (~> 2.2, >= 2.2.1)
+  gremlin_client (~> 0.1.5)
+
+RUBY VERSION
+   ruby 2.3.1p112
+
+BUNDLED WITH
+   1.15.1
