@@ -20,7 +20,7 @@ DEPENDENCIES
   gremlin_client (~> 0.1.5)
 
 RUBY VERSION
-   ruby 2.3.1p112
+   ruby 2.4.1p111
 
 BUNDLED WITH
    1.15.1

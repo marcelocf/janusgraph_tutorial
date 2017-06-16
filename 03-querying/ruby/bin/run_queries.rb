@@ -1,23 +1,57 @@
 #!/usr/bin/env ruby
 # this is a super simple graph db query execution example.
 
-
 require 'gremlin_client'
 require 'connection_pool'
 require 'pp'
 
 
-conn = GremlinClient::Connection.new
 
-
-parameter = {
-  userNameProperty: 'marcelocf.janusgraph.userName',
-  userName: 'testUser0'
+# $bindings are set as variables you can use within your query
+$bindings = {
+  userLabel:         'user',
+  statusUpdateLabel: 'statusUpdate',
+  followsLabel:      'follows',
+  postsLabel:        'posts',
+  contentProperty:   'marcelocf.janusgraph.content',
+  createdAtProperty: 'marcelocf.janusgraph.createdAt',
+  userNameProperty:  'marcelocf.janusgraph.userName',
+  userName:          'testUser0'
 }
 
-pp conn.send_query(
-  'g.V().hasLabel("user").has(userNameProperty, userName)',
-  parameter
+
+########################
+# Using One Connection #
+########################
+
+puts 'Connecting to Gremlin Server'
+$conn = GremlinClient::Connection.new
+
+
+def print(description, results)
+  puts <<EOF
+---------------------------------------------------------------------
+#{description}
+
+#{results.pretty_inspect}
+---------------------------------------------------------------------
+EOF
+end
+print(1,2)
+
+def run_query(description, query)
+  print(
+    description,
+    $conn.send_query(
+      query,
+      $bindings
+    )
+  )
+end
+
+run_query(
+  'Query the user',
+  'g.V().hasLabel("user").has(userNameProperty, userName)'
 )
 
 
@@ -29,3 +63,7 @@ GremlinClient::Connection.pool =
       gremlin_script_path: 'scripts'
     );
   end
+
+GremlinClient::Connection.pool.with do |pooled_conn|
+  pp pooled_conn.send_file('follow_recommendation.groovy', $bindings)
+end
