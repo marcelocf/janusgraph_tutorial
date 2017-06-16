@@ -3,9 +3,9 @@
 I provide 3 different implementations of the queries discussed here, them being:
 
 
-* [java_remote]: runs the queries in a remote instance of JanusGraph.
-* [java_builtin]: runs the queries in a built-in instance of JanusGraph (but still connects to cassandra and elasticsearch).
-* [ruby]: simple ruby version, that relies on Groovy scripts.
+* [java\_remote](java_remote): runs the queries in a remote instance of JanusGraph.
+* [java\_builtin](java_builtin): runs the queries in a built-in instance of JanusGraph (but still connects to cassandra and elasticsearch).
+* [ruby](ruby): simple ruby version, that relies on Groovy scripts.
 
 
 # Queries
