@@ -34,9 +34,9 @@ def print(description, results, duration)
 #{description}
 
 #{results.pretty_inspect.strip}
----------------------------------------------------------------------
-Duration: #{duration}s
 
+Duration: #{duration}s
+---------------------------------------------------------------------
 EOF
 
 end
