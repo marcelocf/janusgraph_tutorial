@@ -20,12 +20,14 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.hasLab
 public class ComputeWeight {
   private final static Logger LOGGER = LoggerFactory.getLogger(ComputeWeight.class);
 
+  public final static String HADOOP_CONFIG_FILE = "conf/janusgraph-hadoop.properties";
+
   public static void main(String[] argv) throws InterruptedException, IOException {
     Graph hadoopGraph = null;
 
     try {
       LOGGER.info("Connect to the hadoop graph");
-      hadoopGraph = GraphFactory.open(new PropertiesConfiguration("conf/janusgraph-hadoop.properties"));
+      hadoopGraph = GraphFactory.open(new PropertiesConfiguration(HADOOP_CONFIG_FILE));
       ComputeWeightVertexProgram.Builder builder = ComputeWeightVertexProgram.build().withRwGraphConfig(Schema.CONFIG_FILE);
 
       ComputerResult result = hadoopGraph.

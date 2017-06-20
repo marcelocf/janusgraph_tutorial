@@ -16,6 +16,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * This is a quite complex task, I don't fully understand myself. However there a couple of things to keep on:
+ * <ul>
+ *  <li>{@link #workerIterationStart} and {@link #workerIterationEnd} methods will handle connection to a read-write enabled graph</li>
+ *  <li>{@link #execute} actually runs the computation for one specific vertex</li>
+ *  <li>{@link Builder} is a class used to initialize this vertex program</li>
+ */
 class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComputeWeightVertexProgram.class);
@@ -25,15 +32,10 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   private JanusGraph graph;
   private GraphTraversalSource g;
 
-  //////////////////////
-  // Main Task Setup //
-  ////////////////////
-
   /**
-   * Keeps the original graph.
-   * @return
+   * Overall setup of our task
+   * @param memory
    */
-
   @Override
   public void setup(Memory memory) {
     LOGGER.info("setup");
@@ -44,10 +46,6 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     return GraphComputer.ResultGraph.ORIGINAL;
   }
 
-  /**
-   * Let the framework know we won't change the queried graph.
-   * @return
-   */
   @Override
   public GraphComputer.Persist getPreferredPersist() {
     return GraphComputer.Persist.NOTHING;
@@ -179,7 +177,6 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     @SuppressWarnings("unchecked")
     @Override
     public ComputeWeightVertexProgram create(final Graph graph) {
-      // TODO: fix how the config is loaded - should be loaded from a 2nd file instead of subset of cfg.
       for (Iterator<String> it = configuration.getKeys(); it.hasNext(); ) {
         String key = it.next();
         System.out.println(key);
@@ -189,6 +186,13 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
       return program;
     }
 
+    /**
+     * Load a configuration from disk in the master node that can be used to connect to the graph from the clients.
+     *
+     * @param configFile
+     * @return
+     * @throws ConfigurationException
+     */
     public Builder withRwGraphConfig(String configFile) throws ConfigurationException {
       PropertiesConfiguration rwConfig = new PropertiesConfiguration(configFile);
       ConfigurationUtils.append(rwConfig, configuration);
