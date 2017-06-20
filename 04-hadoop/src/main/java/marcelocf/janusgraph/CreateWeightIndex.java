@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CreateIndex creation for our example graph db
+ * CreateWeightIndex creation for our example graph db
  */
-public class CreateIndex {
+public class CreateWeightIndex {
 
   ////////////////////////
   // Static Attributes //
@@ -24,7 +24,7 @@ public class CreateIndex {
    * <br/>
    * Here we just use the same as JanusGraph.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateIndex.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateWeightIndex.class);
 
 
   public static final String WEIGHT = "weight";
@@ -40,7 +40,7 @@ public class CreateIndex {
    */
   public static void main(String[] argv) {
     // conect the graph
-    CreateIndex schema = new CreateIndex(Schema.CONFIG_FILE);
+    CreateWeightIndex schema = new CreateWeightIndex(Schema.CONFIG_FILE);
 
     schema.createWeightIndex();
 
@@ -72,7 +72,7 @@ public class CreateIndex {
    *
    * @param configFile
    */
-  public CreateIndex(String configFile) {
+  public CreateWeightIndex(String configFile) {
     LOGGER.info("Connecting graph");
     graph = JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");

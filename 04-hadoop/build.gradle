@@ -63,7 +63,7 @@ task zip(type: Zip) {
 
 
 // Define the main class for the application
-mainClassName = 'marcelocf.janusgraph.CreateIndex'
+mainClassName = 'marcelocf.janusgraph.CreateWeightIndex'
 applicationName = 'create-index'
 applicationDefaultJvmArgs = ['-Dlog4j.configuration=log4j.properties']
 
