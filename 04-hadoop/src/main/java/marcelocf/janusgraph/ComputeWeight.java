@@ -26,7 +26,7 @@ public class ComputeWeight {
     try {
       LOGGER.info("Connect to the hadoop graph");
       hadoopGraph = GraphFactory.open(new PropertiesConfiguration("conf/janusgraph-hadoop.properties"));
-      ComputeWeightVertexProgram.Builder builder = ComputeWeightVertexProgram.build();
+      ComputeWeightVertexProgram.Builder builder = ComputeWeightVertexProgram.build().withRwGraphConfig(Schema.CONFIG_FILE);
 
       ComputerResult result = hadoopGraph.
           compute().

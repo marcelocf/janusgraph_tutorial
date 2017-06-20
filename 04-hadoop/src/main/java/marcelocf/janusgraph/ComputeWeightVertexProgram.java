@@ -1,9 +1,7 @@
 
 package marcelocf.janusgraph;
 
-import org.apache.commons.configuration.BaseConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationUtils;
+import org.apache.commons.configuration.*;
 import org.apache.tinkerpop.gremlin.process.computer.*;
 import org.apache.tinkerpop.gremlin.process.computer.util.AbstractVertexProgramBuilder;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -182,7 +180,6 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     @Override
     public ComputeWeightVertexProgram create(final Graph graph) {
       // TODO: fix how the config is loaded - should be loaded from a 2nd file instead of subset of cfg.
-      ConfigurationUtils.append(graph.configuration().subset(RW_EXAMPLE_VERTEX_PROGRAM_CFG_PREFIX), configuration);
       for (Iterator<String> it = configuration.getKeys(); it.hasNext(); ) {
         String key = it.next();
         System.out.println(key);
@@ -190,6 +187,12 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
       ComputeWeightVertexProgram program = (ComputeWeightVertexProgram) VertexProgram.createVertexProgram(graph, configuration);
 
       return program;
+    }
+
+    public Builder withRwGraphConfig(String configFile) throws ConfigurationException {
+      PropertiesConfiguration rwConfig = new PropertiesConfiguration(configFile);
+      ConfigurationUtils.append(rwConfig, configuration);
+      return this;
     }
   }
 
