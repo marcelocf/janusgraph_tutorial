@@ -122,3 +122,18 @@ Adding such weight to the `follows` edge, we can change the query to:
 
 This way we limit the number of users we retrieve for the timeline, even if our
 recommendation is for our biggest supernode.
+
+
+## Running
+
+If you got this far in this tutorial I am assuming you are familiar on how to
+run the code by hand now. If not, go back and study the `run.sh` file for each
+example.
+
+Here we have 3 main programs:
+
+* **create-index:** will create the *weight* index.
+* **compute-weight:** run spark with the built-in spark
+* **timeline:** print the timeline for a specific user.
+
+Make sure to run the commands in the presented order.
