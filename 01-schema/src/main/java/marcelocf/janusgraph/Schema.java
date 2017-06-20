@@ -175,7 +175,7 @@ public class Schema {
    * @param propertyKey property key
    * @return
    */
-  public String indexName(String label, String propertyKey) {
+  public static String indexName(String label, String propertyKey) {
     return label + ":by:" + propertyKey;
   }
 }

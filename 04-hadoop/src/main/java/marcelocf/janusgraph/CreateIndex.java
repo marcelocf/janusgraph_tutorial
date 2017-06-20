@@ -2,10 +2,11 @@
 package marcelocf.janusgraph;
 
 import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.janusgraph.core.*;
+import org.janusgraph.core.EdgeLabel;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.PropertyKey;
 import org.janusgraph.core.schema.JanusGraphManagement;
-import org.janusgraph.core.schema.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,32 +26,8 @@ public class CreateIndex {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateIndex.class);
 
-  /**
-   * The configuration file path relative to the execute path of this code.
-   * <br/>
-   *
-   * It is assumed you will run within the distributions folder.
-   */
-  public static final String CONFIG_FILE = "conf/janusgraph.properties";
 
-  /**
-   * The index backend is identified by a key in the configuration; in our example we called it
-   * <pre>search</pre>.
-   * <br/>
-   * Saving it in a static variable so we can reuse.
-   */
-  public static final String BACKING_INDEX = "search";
-
-  public static final String USER = "user";
-  public static final String USER_NAME = "marcelocf.janusgraph.userName";
-
-  public static final String STATUS_UPDATE = "statusUpdate";
-  public static final String CONTENT = "marcelocf.janusgraph.content";
-
-  public static final String CREATED_AT = "marcelocf.janusgraph.createdAt";
-
-  public static final String POSTS = "posts";
-  public static final String FOLLOWS = "follows";
+  public static final String WEIGHT = "weight";
 
 
   /////////////////////
@@ -63,12 +40,9 @@ public class CreateIndex {
    */
   public static void main(String[] argv) {
     // conect the graph
-    CreateIndex schema = new CreateIndex(CONFIG_FILE);
+    CreateIndex schema = new CreateIndex(Schema.CONFIG_FILE);
 
-
-    schema.createUserCreateIndex();
-    schema.createStatusUpdateCreateIndex();
-    schema.createEdgeCreateIndex();
+    schema.createWeightIndex();
 
     schema.close();
   }
@@ -106,55 +80,20 @@ public class CreateIndex {
   }
 
   /**
-   * Create the user schema - vertex label, property and index.
-   */
-  private void createUserCreateIndex(){
-    LOGGER.info("Create {} schema", USER);
-    VertexLabel user = mgt.makeVertexLabel(USER).make();
-    PropertyKey userName = mgt.makePropertyKey(USER_NAME).dataType(String.class).make();
-
-    mgt.buildIndex(indexName(USER, USER_NAME), Vertex.class).
-        addKey(userName, Mapping.STRING.asParameter()).
-        indexOnly(user).
-        buildMixedIndex(BACKING_INDEX);
-  }
-
-  /**
-   * Create the statusUpdate schema - vertex label, property and full-text index.
-   */
-  private void createStatusUpdateCreateIndex(){
-    LOGGER.info("Create {} schema", STATUS_UPDATE);
-    VertexLabel statusUpdate = mgt.makeVertexLabel(STATUS_UPDATE).make();
-    PropertyKey content = mgt.makePropertyKey(CONTENT).dataType(String.class).make();
-
-    mgt.buildIndex(indexName(STATUS_UPDATE, CONTENT), Vertex.class).
-        addKey(content, Mapping.TEXTSTRING.asParameter()).
-        indexOnly(statusUpdate).
-        buildMixedIndex(BACKING_INDEX);
-  }
-
-
-  /**
    * Create both <i>posts</i> and <i>follows</i> edges and related index.
    * <br/>
    *
    * Because the property and index for both follows and posts is the same we create them at the same point here.
    */
-  private void createEdgeCreateIndex() {
+  private void createWeightIndex() {
     LOGGER.info("create edges schema");
-    EdgeLabel posts = mgt.makeEdgeLabel(POSTS).make();
-    EdgeLabel follows = mgt.makeEdgeLabel(FOLLOWS).make();
-    PropertyKey createdAt = mgt.makePropertyKey(CREATED_AT).dataType(Long.class).make();
+    EdgeLabel follows = mgt.getEdgeLabel(Schema.FOLLOWS);
+    PropertyKey weight = mgt.makePropertyKey(WEIGHT).dataType(Float.class).make();
 
-    mgt.buildIndex(indexName(POSTS, CREATED_AT), Edge.class).
-        addKey(createdAt).
-        indexOnly(posts).
-        buildMixedIndex(BACKING_INDEX);
-
-    mgt.buildIndex(indexName(FOLLOWS, CREATED_AT), Edge.class).
-        addKey(createdAt).
+    mgt.buildIndex(Schema.indexName(Schema.FOLLOWS, WEIGHT), Edge.class).
+        addKey(weight).
         indexOnly(follows).
-        buildMixedIndex(BACKING_INDEX);
+        buildMixedIndex(Schema.BACKING_INDEX);
   }
 
   /**
@@ -165,17 +104,5 @@ public class CreateIndex {
     mgt.commit();
     graph.tx().commit();
     graph.close();
-  }
-
-
-  /**
-   * We are using this to create predictable names for our indexes. You could name it however you want, but doing
-   * like this will make it possible to reindex stuff in the future... if we want (we do want, btw)
-   * @param label edge or vertex label
-   * @param propertyKey property key
-   * @return
-   */
-  public String indexName(String label, String propertyKey) {
-    return label + ":by:" + propertyKey;
   }
 }
