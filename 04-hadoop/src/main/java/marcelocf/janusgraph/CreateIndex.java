@@ -86,7 +86,7 @@ public class CreateIndex {
    * Because the property and index for both follows and posts is the same we create them at the same point here.
    */
   private void createWeightIndex() {
-    LOGGER.info("create edges schema");
+    LOGGER.info("create weight index");
     EdgeLabel follows = mgt.getEdgeLabel(Schema.FOLLOWS);
     PropertyKey weight = mgt.makePropertyKey(WEIGHT).dataType(Float.class).make();
 
