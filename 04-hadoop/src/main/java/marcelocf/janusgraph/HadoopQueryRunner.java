@@ -17,15 +17,24 @@ public class HadoopQueryRunner extends QueryRunner {
     return countCommonFollowedUsers(getUser(userB).next());
   }
 
-  public long countCommonFollowedUsers(Vertex userB) {
+  public long countCommonFollowedUsers(Vertex otherUser) {
     return g.
-        V(userB).as("userB"). // store userB in a side effect for later usage
-        V(getUser()).                     // then starts traversing from userA
+        V(otherUser.id()).aggregate("otherUser"). // store otherUser in a side effect for later usage
+        V(getUser().next().id()).                     // then starts traversing from userA
         out("follows").
         in("follows").
-        where(P.within("userB")).
+        where(P.within("otherUser")).
         count().
         next(); // we don't need to check for existence because this can be just null
+  }
+
+  public long countPostsPerDaySince(long since) {
+    return g.
+        V(getUser().next()).
+        outE(Schema.POSTS).
+        has(Schema.CREATED_AT, P.gte(since)).
+        count().
+        next();
   }
 
 }

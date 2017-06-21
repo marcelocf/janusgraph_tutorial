@@ -3,6 +3,8 @@ package marcelocf.janusgraph;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
 
+import java.util.Date;
+
 /**
  * Prints out the timeline to stdout
  * <br/>
@@ -15,7 +17,12 @@ public class Timeline {
     HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser0");
     q.close();
 
-    System.out.println(q.countCommonFollowedUsers("testUser0"));
+    for(int i = 0; i < 100; i++) {
+      long t = (new Date()).getTime();
+      long c = q.countCommonFollowedUsers("testUser"+i);
+      t = (new Date()).getTime() - t;
+      System.out.println(c + " in " + t + "ms");
+    }
     graph.close();
   }
 }

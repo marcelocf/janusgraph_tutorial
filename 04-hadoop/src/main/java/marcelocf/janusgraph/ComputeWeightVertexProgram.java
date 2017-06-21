@@ -4,7 +4,9 @@ package marcelocf.janusgraph;
 import org.apache.commons.configuration.*;
 import org.apache.tinkerpop.gremlin.process.computer.*;
 import org.apache.tinkerpop.gremlin.process.computer.util.AbstractVertexProgramBuilder;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
@@ -13,6 +15,7 @@ import org.javatuples.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,6 +34,7 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   private BaseConfiguration configuration;
   private JanusGraph graph;
   private GraphTraversalSource g;
+  private long sevenDaysAgo;
 
   /**
    * Overall setup of our task
@@ -62,6 +66,7 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     // TODO: add method in GraphEtl that allows us to simply copy from config to properties.
     graph = JanusGraphFactory.open(configuration);
     g = graph.traversal();
+    sevenDaysAgo = (new Date()).getTime() - (1000 * 60 * 60 * 24 * 7);
   }
 
   @Override
@@ -87,21 +92,34 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
    */
   @Override
   public void execute(Vertex vertex, Messenger<Tuple> messenger, Memory memory) {
-    Vertex changeV = g.V(vertex.id()).next();
-    if(changeV == null) {
-      // situation where the vertex has been deleted after it has been loaded by gremlin hadoop
-      LOGGER.warn("Skipping null vertex");
-      return;
-    }
-
     try {
-      // TODO: implement the cool stuff here
+      GraphTraversal<Vertex, Edge> t = g.V(vertex.id()).outE(Schema.FOLLOWS);
+      while(t.hasNext()) {
+        updateWeight(t.next());
+      }
     } catch (Exception e){
       e.printStackTrace();
       LOGGER.error("while processing " + vertex.id() + ": " + e.getClass().toString() + "(" + e.getMessage() + ")");
       return;
     }
   }
+
+
+  private void updateWeight(Edge followsEdge) throws Exception {
+    Vertex otherUser = followsEdge.inVertex();
+    long since = followsEdge.value(Schema.CREATED_AT);
+    if(since < sevenDaysAgo) {
+      since = sevenDaysAgo;
+    }
+
+    HadoopQueryRunner runner = new HadoopQueryRunner(g, otherUser.value(Schema.USER_NAME));
+    long commonFollowedUsers = runner.countCommonFollowedUsers(followsEdge.outVertex());
+    long postsPerDaySince = runner.countPostsPerDaySince(since );
+    long weight = (commonFollowedUsers + postsPerDaySince) / 2;
+
+    followsEdge.property(CreateWeightIndex.WEIGHT, weight);
+  }
+
 
   /**
    * Run the task only once for each vertex.
