@@ -115,7 +115,7 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     HadoopQueryRunner runner = new HadoopQueryRunner(g, otherUser.value(Schema.USER_NAME));
     long commonFollowedUsers = runner.countCommonFollowedUsers(followsEdge.outVertex());
     long postsPerDaySince = runner.countPostsPerDaySince(since );
-    long weight = (commonFollowedUsers + postsPerDaySince) / 2;
+    long weight = (3 * commonFollowedUsers + postsPerDaySince) / 4;
 
     followsEdge.property(CreateWeightIndex.WEIGHT, weight);
   }
