@@ -29,8 +29,8 @@ public class QueryRunner {
   // Instance Methods //
   /////////////////////
 
-  private final GraphTraversalSource g;
-  private final String userName;
+  protected final GraphTraversalSource g;
+  protected final String userName;
 
   private long startedAt;
 
@@ -44,6 +44,10 @@ public class QueryRunner {
   }
 
   public GraphTraversal<Vertex, Vertex> getUser() {
+    return getUser(userName);
+  }
+
+  public GraphTraversal<Vertex, Vertex> getUser(String userName) {
     return g.V().hasLabel(Schema.USER).has(USER_NAME, eq(userName));
   }
 

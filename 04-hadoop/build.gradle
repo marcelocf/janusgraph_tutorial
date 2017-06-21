@@ -52,6 +52,7 @@ dependencies {
   compile 'com.github.javafaker:javafaker:0.13'
 
   compile project(':01-schema')
+  compile project(':03-querying')
 }
 
 
