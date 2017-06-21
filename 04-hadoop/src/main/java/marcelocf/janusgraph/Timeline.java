@@ -12,9 +12,10 @@ public class Timeline {
 
   public static void main(String argv[]) throws Exception {
     JanusGraph graph = JanusGraphFactory.open(Schema.CONFIG_FILE);
-    HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser1");
+    HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser0");
     q.close();
-    System.out.println(q.countCommonFollowedUsers("testUser2"));
-    //Vertex userA = q.getUser("testUser1");
+
+    System.out.println(q.countCommonFollowedUsers("testUser0"));
+    graph.close();
   }
 }

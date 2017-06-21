@@ -2,6 +2,7 @@
  * Setup for the Build Script
  */
 
+
 buildscript {
   repositories {
     jcenter()
@@ -61,14 +62,22 @@ task zip(type: Zip) {
     from configurations.runtime
 }
 
-
+def logSettings = ['-Dlog4j.configuration=conf/log4j.properties']
 
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.CreateWeightIndex'
 applicationName = 'create-index'
-applicationDefaultJvmArgs = ['-Dlog4j.configuration=log4j.properties']
+applicationDefaultJvmArgs = logSettings
 
 
-applicationDistribution.from('conf') {
-  into 'conf'
+task timelineScript(type: CreateStartScripts) {
+  mainClassName="marcelocf.janusgraph.Timeline"
+  applicationName="timeline"
+  outputDir = file('build/scripts')
+  classpath = jar.outputs.files + project.configurations.runtime
+  defaultJvmOpts = logSettings
 }
+
+distZip.dependsOn timelineScript
+
+distZip.setArchiveName('04-hadoop.zip')
