@@ -78,6 +78,15 @@ task timelineScript(type: CreateStartScripts) {
   defaultJvmOpts = logSettings
 }
 
+task computeWeightScript(type: CreateStartScripts) {
+  mainClassName="marcelocf.janusgraph.ComputeWeight"
+  applicationName="compute-weight"
+  outputDir = file('build/scripts')
+  classpath = jar.outputs.files + project.configurations.runtime
+  defaultJvmOpts = logSettings
+}
+
 distZip.dependsOn timelineScript
+distZip.dependsOn computeWeightScript
 
 distZip.setArchiveName('04-hadoop.zip')
