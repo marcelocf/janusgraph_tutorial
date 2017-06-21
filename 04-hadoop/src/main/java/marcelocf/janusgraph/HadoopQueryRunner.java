@@ -13,10 +13,14 @@ public class HadoopQueryRunner extends QueryRunner {
     super(traversalSource, userName);
   }
 
-  public long countCommonFollowedUsers(Vertex userA, Vertex userB) {
+  public long countCommonFollowedUsers(String userB) {
+    return countCommonFollowedUsers(getUser(userB).next());
+  }
+
+  public long countCommonFollowedUsers(Vertex userB) {
     return g.
         V(userB).as("userB"). // store userB in a side effect for later usage
-        V(userA).                     // then starts traversing from userA
+        V(getUser()).                     // then starts traversing from userA
         out("follows").
         in("follows").
         where(P.within("userB")).

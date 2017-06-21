@@ -14,6 +14,7 @@ public class Timeline {
     JanusGraph graph = JanusGraphFactory.open(Schema.CONFIG_FILE);
     HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser1");
     q.close();
+    System.out.println(q.countCommonFollowedUsers("testUser2"));
     //Vertex userA = q.getUser("testUser1");
   }
 }
