@@ -192,6 +192,10 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   }
   public static class Builder extends AbstractVertexProgramBuilder<Builder> {
 
+    public Builder(){
+      super(ComputeWeightVertexProgram.class);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public ComputeWeightVertexProgram create(final Graph graph) {
