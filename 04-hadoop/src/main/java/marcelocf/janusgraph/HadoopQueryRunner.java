@@ -42,6 +42,9 @@ public class HadoopQueryRunner extends QueryRunner {
 
   public long countPostsPerDaySince(Vertex user, long since) {
     long days = ( (new Date()).getTime() - since ) / (1000*60*60*24);
+    if(days == 0) {
+      days = 1;
+    }
     return countPostsSince(user, since) / days;
   }
 
