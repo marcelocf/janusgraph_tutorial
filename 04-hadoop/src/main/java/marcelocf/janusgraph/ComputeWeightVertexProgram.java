@@ -29,7 +29,6 @@ import java.util.Set;
 class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComputeWeightVertexProgram.class);
-  private static final String RW_EXAMPLE_VERTEX_PROGRAM_CFG_PREFIX = "rw_example";
 
   private BaseConfiguration configuration;
   private JanusGraph graph;
@@ -93,9 +92,18 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   @Override
   public void execute(Vertex vertex, Messenger<Tuple> messenger, Memory memory) {
     try {
-      GraphTraversal<Vertex, Edge> t = g.V(vertex.id()).outE(Schema.FOLLOWS);
+      HadoopQueryRunner runner = new HadoopQueryRunner(g, vertex.value(Schema.USER_NAME));
+      GraphTraversal<Vertex, Edge> t = g.V(vertex.id()).inE(Schema.FOLLOWS);
+
       while(t.hasNext()) {
-        updateWeight(t.next());
+        Edge followsEdge = t.next();
+
+        long commonFollowedUsers = runner.countCommonFollowedUsers(followsEdge.outVertex());
+        long postsPerDaySince = runner.countPostsPerDaySince(sevenDaysAgo);
+        long weight = (3 * commonFollowedUsers + postsPerDaySince) / 4;
+
+        LOGGER.info("============== {} ==============", weight);
+        //followsEdge.property(CreateWeightIndex.WEIGHT, weight);
       }
     } catch (Exception e){
       e.printStackTrace();
@@ -105,19 +113,8 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   }
 
 
-  private void updateWeight(Edge followsEdge) throws Exception {
-    Vertex otherUser = followsEdge.inVertex();
-    long since = followsEdge.value(Schema.CREATED_AT);
-    if(since < sevenDaysAgo) {
-      since = sevenDaysAgo;
-    }
+  private void updateWeight(Edge followsEdge, long weight) throws Exception {
 
-    HadoopQueryRunner runner = new HadoopQueryRunner(g, otherUser.value(Schema.USER_NAME));
-    long commonFollowedUsers = runner.countCommonFollowedUsers(followsEdge.outVertex());
-    long postsPerDaySince = runner.countPostsPerDaySince(since);
-    long weight = (3 * commonFollowedUsers + postsPerDaySince) / 4;
-
-    followsEdge.property(CreateWeightIndex.WEIGHT, weight);
   }
 
 
