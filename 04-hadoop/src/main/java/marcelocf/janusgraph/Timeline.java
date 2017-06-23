@@ -22,7 +22,7 @@ public class Timeline {
       long c = q.countCommonFollowedUsers("testUser"+i);
       long pc = q.countPostsPerDaySince("testUser"+i, (new Date()).getTime() - 1000*7*24*60*60);
       t = (new Date()).getTime() - t;
-      System.out.println(c + "and " + pc + " in " + t + "ms");
+      System.out.println(c + " and " + pc + " in " + t + "ms");
     }
     graph.close();
   }
