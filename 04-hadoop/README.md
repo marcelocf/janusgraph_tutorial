@@ -124,6 +124,49 @@ This way we limit the number of users we retrieve for the timeline, even if our
 recommendation is for our biggest supernode.
 
 
+## Before we Start
+
+Before we run, there are a couple of changes that we need to do. First, during
+my experiments cassandra kept crashing. Also, ElasticSearch comes with dynamic
+scripting disabled, which is required by JanusGraph to update values.
+
+To fix both issues, first make sure JanusGraph is not running:
+
+```bash
+./stop_janus.sh
+```
+
+Then enter the JanusGraph working dir:
+
+```bash
+cd work/janusgraph-0.1.0-hadoop2/
+```
+
+Now, open the file `conf/es/elasticsearch.yml` in a text editor and add the
+following line to the end of it:
+
+```yml
+script.disable_dynamic: false 
+```
+
+With that done, run both cassandra and elasticsearch in two different
+terminals.
+
+```bash
+./bin/elasticsearch
+./bin/cassandra
+```
+
+
+Doing this also gives you a perspective of what components should be optimized
+in a production environment. Also, hadoop leverages the concurrency veatures of
+both cassandra and elasticsearch, so this exposure is also good for
+understanding this.
+
+And at last, notice we do not have the main JanusGraph server running. Instead,
+our Java code has the JanusGraph code built in and uses it to connect to the
+servers.
+
 ## Running
 
 If you got this far in this tutorial I am assuming you are familiar on how to
