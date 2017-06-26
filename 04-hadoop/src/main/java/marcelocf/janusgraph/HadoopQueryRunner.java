@@ -1,10 +1,16 @@
 package marcelocf.janusgraph;
 
 import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.Date;
+
+import static marcelocf.janusgraph.Schema.*;
+import static org.apache.tinkerpop.gremlin.process.traversal.Order.decr;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.without;
 
 /**
  * Created by marcelo on 17/06/21.
@@ -29,7 +35,6 @@ public class HadoopQueryRunner extends QueryRunner {
         count().
         next(); // we don't need to check for existence because this can be just null
   }
-
 
 
   public long countPostsPerDaySince(long since) {
@@ -57,4 +62,39 @@ public class HadoopQueryRunner extends QueryRunner {
         next();
   }
 
+  @Override
+  public GraphTraversal<Vertex, Vertex> getFollowRecommendation(){
+    return getUser().
+        aggregate("me").
+        aggregate("ignore").
+        outE(Schema.FOLLOWS).
+        order().by(CreateWeightIndex.WEIGHT, decr).
+        outV().
+        aggregate("ignore").
+        cap("me").
+        unfold().
+        inE(Schema.FOLLOWS).
+        order().by(CreateWeightIndex.WEIGHT, decr).
+        inV().
+        where(without("ignore"));
+  }
+
+  @Override
+  public GraphTraversal<Vertex, Vertex> getTimeline(int limit){
+    return getUser().
+        aggregate("users").
+        local(
+          __.outE(FOLLOWS).
+          order().by(CreateWeightIndex.WEIGHT, decr).
+          limit(50).
+          outV()
+        ).
+        aggregate("users").
+        cap("users").
+        unfold().
+        outE(POSTS).
+        order().by(CREATED_AT, decr).
+        limit(limit).
+        inV();
+  }
 }
