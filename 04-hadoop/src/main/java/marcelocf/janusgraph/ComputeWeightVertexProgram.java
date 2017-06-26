@@ -35,6 +35,8 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
   private GraphTraversalSource g;
   private long sevenDaysAgo;
 
+  int count, min, max;
+
   /**
    * Overall setup of our task
    * @param memory
@@ -66,10 +68,14 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     graph = JanusGraphFactory.open(configuration);
     g = graph.traversal();
     sevenDaysAgo = (new Date()).getTime() - (1000 * 60 * 60 * 24 * 7);
+    count = 0;
+    min = -10;
+    max = 0;
   }
 
   @Override
   public void workerIterationEnd(final Memory memory) {
+    LOGGER.info("Computed {} weight(s). Min: {}; Max:{};", count, min, max);
     graph.tx().commit();
     try {
       g.close();
@@ -101,9 +107,15 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
         long commonFollowedUsers = runner.countCommonFollowedUsers(followsEdge.outVertex());
         long postsPerDaySince = runner.countPostsPerDaySince(sevenDaysAgo);
         long weight = (3 * commonFollowedUsers + postsPerDaySince) / 4;
+        if(min == -10 || min > weight) {
+          min = (int) weight;
+        }
+        if(max < weight) {
+          max = (int) weight;
+        }
+        count++;
 
-        LOGGER.info("============== {} ==============", weight);
-        //followsEdge.property(CreateWeightIndex.WEIGHT, weight);
+        followsEdge.property(CreateWeightIndex.WEIGHT, weight);
       }
     } catch (Exception e){
       e.printStackTrace();
