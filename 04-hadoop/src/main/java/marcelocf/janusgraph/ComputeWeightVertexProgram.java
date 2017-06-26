@@ -124,12 +124,6 @@ class ComputeWeightVertexProgram implements VertexProgram<Tuple>{
     }
   }
 
-
-  private void updateWeight(Edge followsEdge, long weight) throws Exception {
-
-  }
-
-
   /**
    * Run the task only once for each vertex.
    *
