@@ -143,7 +143,7 @@ public class QueryRunner {
    * Just a simple print method for every property returned from a vertex traversal
    * @param traversal
    */
-  private void print(GraphTraversal<Vertex, Vertex> traversal) {
+  public void print(GraphTraversal<Vertex, Vertex> traversal) {
     resetTimer();
     GraphTraversal<Vertex, Map<String, Object>> valueMap = traversal.valueMap(true);
     int count = 0;
@@ -155,7 +155,7 @@ public class QueryRunner {
     LOGGER.info("Printed {} element(s) in {}ms", count, duration());
   }
 
-  private void printTimeline(GraphTraversal<Vertex, Map<String, Map<String, Object>>> traversal) {
+  public void printTimeline(GraphTraversal<Vertex, Map<String, Map<String, Object>>> traversal) {
     int count = 0;
     resetTimer();
     while (traversal.hasNext()) {
@@ -175,7 +175,7 @@ public class QueryRunner {
     LOGGER.info("Printed {} element(s) in {}ms", count, duration());
   }
 
-  private String formatTimestamp(Long timestamp) {
+  public String formatTimestamp(Long timestamp) {
     Date d = new Date(timestamp);
     return d.toString();
   }

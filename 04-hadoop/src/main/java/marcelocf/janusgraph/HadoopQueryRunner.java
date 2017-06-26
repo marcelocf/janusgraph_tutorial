@@ -7,6 +7,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.Date;
+import java.util.Map;
 
 import static marcelocf.janusgraph.Schema.*;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.decr;
@@ -79,22 +80,26 @@ public class HadoopQueryRunner extends QueryRunner {
         where(without("ignore"));
   }
 
-  @Override
-  public GraphTraversal<Vertex, Vertex> getTimeline(int limit){
+  public GraphTraversal<Vertex, Map<String, Map<String,Object>>> getTimeline3(int limit){
     return getUser().
         aggregate("users").
         local(
-          __.outE(FOLLOWS).
-          order().by(CreateWeightIndex.WEIGHT, decr).
-          limit(50).
-          outV()
+            __.outE(FOLLOWS).
+                order().by(CreateWeightIndex.WEIGHT, decr).
+                dedup().
+                limit(50).
+                outV()
         ).
         aggregate("users").
         cap("users").
         unfold().
+        as(userVertex).
         outE(POSTS).
+        as(postsEdge).
         order().by(CREATED_AT, decr).
         limit(limit).
-        inV();
+        inV().
+        as(statusUpdateVertex).
+        select(userVertex, postsEdge, statusUpdateVertex);
   }
 }
