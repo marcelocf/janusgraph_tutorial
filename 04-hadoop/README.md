@@ -102,16 +102,18 @@ Adding such weight to the `follows` edge, we can change the query to:
     return getUser().
         aggregate("users").
         local(
-          outE(FOLLOWS).
-          has(WEIGHT, gt(0)).
-          order().by(WEIGHT, decr).
-          limit(200)
+            __.outE(FOLLOWS).
+                order().by(CreateWeightIndex.WEIGHT, decr).
+                dedup().
+                limit(50).
+                inV()
         ).
         aggregate("users").
         cap("users").
         unfold().
         as(userVertex).
         outE(POSTS).
+        dedup().
         as(postsEdge).
         order().by(CREATED_AT, decr).
         limit(limit).
@@ -122,6 +124,9 @@ Adding such weight to the `follows` edge, we can change the query to:
 
 This way we limit the number of users we retrieve for the timeline, even if our
 recommendation is for our biggest supernode.
+
+The `local()` step is to make sure its internall `limit()` will do what we want: reutrn only the most relevant users
+for this query.
 
 
 ## Before we Start
@@ -180,3 +185,16 @@ Here we have 3 main programs:
 * **timeline:** print the timeline for a specific user.
 
 Make sure to run the commands in the presented order.
+
+
+## Results
+
+The final code ensures we return in a predictable way even if the user is following way to many users.
+
+This is, by no means, the best solution. The query actually takes a little bit longer to execute than the previous
+one for users following only a few people.
+
+Also, the weight is being indexed in a centralized index inside elasticsearch; not the most efficient way for doing this.
+
+In the next section, [05-indexing-for-performance](../05-indexing-for-performance) we will describe a way to improve the
+query time.
