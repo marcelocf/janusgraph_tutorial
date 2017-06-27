@@ -88,13 +88,14 @@ public class HadoopQueryRunner extends QueryRunner {
                 order().by(CreateWeightIndex.WEIGHT, decr).
                 dedup().
                 limit(50).
-                outV()
+                inV()
         ).
         aggregate("users").
         cap("users").
         unfold().
         as(userVertex).
         outE(POSTS).
+        dedup().
         as(postsEdge).
         order().by(CREATED_AT, decr).
         limit(limit).

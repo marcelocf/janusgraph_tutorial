@@ -2,6 +2,8 @@ package marcelocf.janusgraph;
 
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -12,25 +14,16 @@ import java.util.Date;
  */
 public class Timeline {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(Timeline.class);
   public static void main(String argv[]) throws Exception {
     JanusGraph graph = JanusGraphFactory.open(Schema.CONFIG_FILE);
-    HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser2");
+    HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser1");
 
-    q.print(q.getTimeline(100));
+    LOGGER.info("Previous Timeline");
     q.printTimeline(q.getTimeline2(100));
-    q.printTimeline(q.getTimeline2(100));
-    q.printTimeline(q.getTimeline2(100));
-    q.printTimeline(q.getTimeline2(100));
-    q.printTimeline(q.getTimeline2(100));
-    for(int i = 0; i < 100; i++) {
-      long t = (new Date()).getTime();
-      long c = q.countCommonFollowedUsers("testUser"+i);
-      long pc = q.countPostsPerDaySince("testUser"+i, (new Date()).getTime() - 1000*7*24*60*60);
-      t = (new Date()).getTime() - t;
-      System.out.println(c + " and " + pc + " in " + t + "ms");
-    }
+    LOGGER.info("New Timeline");
+    q.printTimeline(q.getTimeline3(100));
 
-    q.printTimeline(q.getTimeline2(100));
     q.close();
     graph.close();
   }
