@@ -19,11 +19,12 @@ public class Timeline {
     JanusGraph graph = JanusGraphFactory.open(Schema.CONFIG_FILE);
     HadoopQueryRunner q = new HadoopQueryRunner(graph.traversal(), "testUser1");
 
-    LOGGER.info("Previous Timeline");
-    q.printTimeline(q.getTimeline2(100));
-    LOGGER.info("New Timeline");
-    q.printTimeline(q.getTimeline3(100));
-
+    for(int i =0; i< 10; i++) {
+      LOGGER.info("Previous Timeline");
+      q.printTimeline(q.getTimeline2(100));
+      LOGGER.info("New Timeline");
+      q.printTimeline(q.getTimeline3(100));
+    }
     q.close();
     graph.close();
   }
