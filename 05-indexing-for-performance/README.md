@@ -3,7 +3,7 @@
 For now our queries are taking quite a long time to run. We want to provide a blasting fast system, so we need to make sure our queries
 can be executed in a fraction of what they are right now.
 
-The reason for this runtime is we centralize our indexes globally. Meaning the `weight`property of every `follows` edge is indexed in
+The reason for this runtime is we centralize our indexes globally. Meaning the `weight` property of every `follows` edge is indexed in
 the same elasticsearch index.
 
 There is a better way for doing that. From [the official documentation](http://docs.janusgraph.org/latest/indexes.html):
