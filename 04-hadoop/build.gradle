@@ -62,7 +62,7 @@ task zip(type: Zip) {
     from configurations.runtime
 }
 
-def logSettings = ['-Dlog4j.configuration=conf/log4j.properties']
+def logSettings = ['-Dlog4j.configuration=log4j.properties']
 
 // Define the main class for the application
 mainClassName = 'marcelocf.janusgraph.CreateWeightIndex'
