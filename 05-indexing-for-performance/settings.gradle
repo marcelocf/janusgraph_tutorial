@@ -1,0 +1,11 @@
+rootProject.name="04-hadoop"
+
+include ':01-schema'
+project(':01-schema').projectDir = new File(settingsDir, '../01-schema')
+
+include ':03-querying'
+project(':03-querying').projectDir = new File(settingsDir, '../03-querying/java_remote')
+
+include ':04-hadoop'
+project(':04-hadoop').projectDir = new File(settingsDir, '../04-hadoop')
+

@@ -1,0 +1,93 @@
+/**
+ * Setup for the Build Script
+ */
+
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.17"
+  }
+}
+
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+
+// Apply the application plugin to add support for building an application
+apply plugin: 'application'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+  //mavenLocal()
+  // Use jcenter for resolving your dependencies.
+  // You can declare any Maven/Ivy/file repository here.
+  jcenter()
+  // directly from amazon since it is binary only distribution
+  maven { url "http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release" }
+  // lots of new dependencies in janus graph are here:
+  maven { url 'http://mvnrepository.com/artifact' }
+
+  // and jitpack repo..
+  maven { url 'https://jitpack.io' }
+}
+
+
+dependencies {
+  // The production code uses Guava
+  compile 'com.google.guava:guava:20.0'
+
+  compile 'org.apache.tinkerpop:gremlin-core:3.2.3'
+  compile 'org.apache.tinkerpop:gremlin-driver:3.2.3'
+  compile 'org.apache.tinkerpop:hadoop-gremlin:3.2.3'
+  compile 'org.apache.tinkerpop:spark-gremlin:3.2.3'
+  compile 'org.janusgraph:janusgraph-core:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop-core:0.1.0'
+  compile 'org.janusgraph:janusgraph-hadoop-2:0.1.0'
+  compile 'org.janusgraph:janusgraph-cassandra:0.1.0'
+  compile 'org.janusgraph:janusgraph-es:0.1.0'
+
+
+  compile 'com.github.javafaker:javafaker:0.13'
+
+  compile project(':01-schema')
+  compile project(':03-querying')
+  compile project(':04-hadoop')
+}
+
+
+task zip(type: Zip) {
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+}
+
+def logSettings = ['-Dlog4j.configuration=log4j.properties']
+
+// Define the main class for the application
+mainClassName = 'marcelocf.janusgraph.CreateWeightIndex'
+applicationName = 'create-index'
+applicationDefaultJvmArgs = logSettings
+
+
+task timelineScript(type: CreateStartScripts) {
+  mainClassName="marcelocf.janusgraph.Timeline"
+  applicationName="timeline"
+  outputDir = file('build/scripts')
+  classpath = jar.outputs.files + project.configurations.runtime
+  defaultJvmOpts = logSettings
+}
+
+task computeWeightScript(type: CreateStartScripts) {
+  mainClassName="marcelocf.janusgraph.ComputeWeight"
+  applicationName="compute-weight"
+  outputDir = file('build/scripts')
+  classpath = jar.outputs.files + project.configurations.runtime
+  defaultJvmOpts = logSettings
+}
+
+distZip.dependsOn timelineScript
+distZip.dependsOn computeWeightScript
+
+distZip.setArchiveName('04-hadoop.zip')
