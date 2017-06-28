@@ -66,28 +66,11 @@ task zip(type: Zip) {
 def logSettings = ['-Dlog4j.configuration=log4j.properties']
 
 // Define the main class for the application
-mainClassName = 'marcelocf.janusgraph.CreateWeightIndex'
-applicationName = 'create-index'
+mainClassName = 'marcelocf.janusgraph.RecreateWeightIndex'
+applicationName = 'recreate-index'
 applicationDefaultJvmArgs = logSettings
-
-
-task timelineScript(type: CreateStartScripts) {
-  mainClassName="marcelocf.janusgraph.Timeline"
-  applicationName="timeline"
-  outputDir = file('build/scripts')
-  classpath = jar.outputs.files + project.configurations.runtime
-  defaultJvmOpts = logSettings
-}
-
-task computeWeightScript(type: CreateStartScripts) {
-  mainClassName="marcelocf.janusgraph.ComputeWeight"
-  applicationName="compute-weight"
-  outputDir = file('build/scripts')
-  classpath = jar.outputs.files + project.configurations.runtime
-  defaultJvmOpts = logSettings
-}
 
 distZip.dependsOn timelineScript
 distZip.dependsOn computeWeightScript
 
-distZip.setArchiveName('04-hadoop.zip')
+distZip.setArchiveName('04-indexing-for-performance')

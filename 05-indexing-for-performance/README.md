@@ -10,3 +10,15 @@ There is a better way for doing that. From [the official documentation](http://d
 
 
 > JanusGraph supports two different kinds of indexing to speed up query processing: graph indexes and vertex-centric indexes. Most graph queries start the traversal from a list of vertices or edges that are identified by their properties. Graph indexes make these global retrieval operations efficient on large graphs. Vertex-centric indexes speed up the actual traversal through the graph, in particular when traversing through vertices with many incident edges.
+
+
+We want to use Vertex Centric indexes while traversing. To do this, we need to change the index type for the properties:
+
+* `weight` in `follows` edges.
+* `createdAt` in `posts` edges.
+
+The way to do this is:
+
+1. delete old index.
+2. create new index.
+3. tell Janus Graph to reindex everything.
