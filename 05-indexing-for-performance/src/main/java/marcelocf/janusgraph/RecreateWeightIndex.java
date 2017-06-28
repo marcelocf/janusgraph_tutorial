@@ -77,7 +77,7 @@ public class RecreateWeightIndex {
    *
    * @param configFile
    */
-  public RecreateWeightIndex(int configFile) {
+  public RecreateWeightIndex(String configFile) {
     LOGGER.info("Connecting graph");
     graph = null;//JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");
@@ -108,6 +108,12 @@ public class RecreateWeightIndex {
         indexOnly(follows).
         buildMixedIndex(Schema.BACKING_INDEX);
   }
+
+  
+  private void reindex() {
+
+  }
+
 
   /**
    * Commit the current transaction and close the graph.
