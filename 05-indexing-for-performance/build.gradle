@@ -70,7 +70,4 @@ mainClassName = 'marcelocf.janusgraph.RecreateWeightIndex'
 applicationName = 'recreate-index'
 applicationDefaultJvmArgs = logSettings
 
-distZip.dependsOn timelineScript
-distZip.dependsOn computeWeightScript
-
-distZip.setArchiveName('04-indexing-for-performance')
+distZip.setArchiveName('05-indexing-for-performance')

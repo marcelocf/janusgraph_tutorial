@@ -6,9 +6,11 @@ import org.janusgraph.core.EdgeLabel;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
 import org.janusgraph.core.PropertyKey;
+import org.janusgraph.core.schema.JanusGraphIndex;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Float;
 
 /**
  * RecreateWeightIndex creation for our example graph db
@@ -28,6 +30,7 @@ public class RecreateWeightIndex {
 
 
   public static final String WEIGHT = "weight";
+  private final String followsWeightIndexName;
 
 
   /////////////////////
@@ -42,7 +45,9 @@ public class RecreateWeightIndex {
     // conect the graph
     RecreateWeightIndex schema = new RecreateWeightIndex(Schema.CONFIG_FILE);
 
-    schema.createWeightIndex();
+    schema.deleteOldIndexes();
+    schema.createNewIndexes();
+    schema.reindex();
 
     schema.close();
   }
@@ -72,11 +77,19 @@ public class RecreateWeightIndex {
    *
    * @param configFile
    */
-  public RecreateWeightIndex(String configFile) {
+  public RecreateWeightIndex(int configFile) {
     LOGGER.info("Connecting graph");
-    graph = JanusGraphFactory.open(configFile);
+    graph = null;//JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");
     mgt = graph.openManagement();
+
+    followsWeightIndexName = Schema.indexName(Schema.FOLLOWS, WEIGHT);
+
+  }
+
+  private void deleteOldIndexes() {
+    JanusGraphIndex index = mgt.getGraphIndex(followsWeightIndexName);
+
   }
 
   /**
@@ -85,7 +98,7 @@ public class RecreateWeightIndex {
    *
    * Because the property and index for both follows and posts is the same we create them at the same point here.
    */
-  private void createWeightIndex() {
+  private void createNewIndexes() {
     LOGGER.info("create weight index");
     EdgeLabel follows = mgt.getEdgeLabel(Schema.FOLLOWS);
     PropertyKey weight = mgt.makePropertyKey(WEIGHT).dataType(Float.class).make();
