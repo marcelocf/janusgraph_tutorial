@@ -1,6 +1,8 @@
 
 package marcelocf.janusgraph;
 
+import org.apache.tinkerpop.gremlin.process.traversal.Order;
+import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.janusgraph.core.EdgeLabel;
 import org.janusgraph.core.JanusGraph;
@@ -8,6 +10,7 @@ import org.janusgraph.core.JanusGraphFactory;
 import org.janusgraph.core.PropertyKey;
 import org.janusgraph.core.schema.JanusGraphIndex;
 import org.janusgraph.core.schema.JanusGraphManagement;
+import org.janusgraph.core.schema.SchemaAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Float;
@@ -28,10 +31,7 @@ public class RecreateWeightIndex {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(RecreateWeightIndex.class);
 
-
   public static final String WEIGHT = "weight";
-  private final String followsWeightIndexName;
-
 
   /////////////////////
   // Static Methods //
@@ -82,14 +82,19 @@ public class RecreateWeightIndex {
     graph = null;//JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");
     mgt = graph.openManagement();
-
-    followsWeightIndexName = Schema.indexName(Schema.FOLLOWS, WEIGHT);
-
   }
 
   private void deleteOldIndexes() {
-    JanusGraphIndex index = mgt.getGraphIndex(followsWeightIndexName);
+    deleteIndex(Schema.FOLLOWS, Schema.CREATED_AT);
+    deleteIndex(Schema.FOLLOWS, WEIGHT);
+    deleteIndex(Schema.POSTS, Schema.CREATED_AT);
+  }
 
+  private void deleteIndex(String label, String propertyKey) {
+    LOGGER.info("Deleting index for edge {} and property {}", label, propertyKey);
+    JanusGraphIndex index = mgt.getGraphIndex(Schema.indexName(label, propertyKey));
+    mgt.updateIndex(index, SchemaAction.REMOVE_INDEX);
+    mgt.commit();
   }
 
   /**
@@ -99,19 +104,28 @@ public class RecreateWeightIndex {
    * Because the property and index for both follows and posts is the same we create them at the same point here.
    */
   private void createNewIndexes() {
-    LOGGER.info("create weight index");
-    EdgeLabel follows = mgt.getEdgeLabel(Schema.FOLLOWS);
-    PropertyKey weight = mgt.makePropertyKey(WEIGHT).dataType(Float.class).make();
-
-    mgt.buildIndex(Schema.indexName(Schema.FOLLOWS, WEIGHT), Edge.class).
-        addKey(weight).
-        indexOnly(follows).
-        buildMixedIndex(Schema.BACKING_INDEX);
+    createVertexCentricIndex(Schema.FOLLOWS, Schema.CREATED_AT);
+    createVertexCentricIndex(Schema.FOLLOWS, WEIGHT);
+    createVertexCentricIndex(Schema.POSTS, Schema.CREATED_AT);
   }
 
-  
-  private void reindex() {
+  private void createVertexCentricIndex(String label, String propertyKey) {
+    LOGGER.info("Creating vertex centric index for edge {} and property {}", label, propertyKey);
+    EdgeLabel edgeLabel = mgt.getEdgeLabel(label);
+    PropertyKey key = mgt.getPropertyKey(propertyKey);
+    mgt.buildEdgeIndex(edgeLabel, Schema.indexName(label, propertyKey), Direction.BOTH, Order.decr, key);
+    mgt.commit();
+  }
 
+  private void reindex() {
+    reindexFor(Schema.FOLLOWS, Schema.CREATED_AT);
+    reindexFor(Schema.FOLLOWS, WEIGHT);
+    reindexFor(Schema.POSTS, Schema.CREATED_AT);
+  }
+
+
+  private void reindexFor(String label, String propertyKey){
+    LOGGER.info("Reindexing index for edge {} and property {}", label, propertyKey);
   }
 
 
