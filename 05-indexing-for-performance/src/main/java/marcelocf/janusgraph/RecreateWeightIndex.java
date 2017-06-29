@@ -4,16 +4,18 @@ package marcelocf.janusgraph;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.janusgraph.core.EdgeLabel;
-import org.janusgraph.core.JanusGraph;
-import org.janusgraph.core.JanusGraphFactory;
-import org.janusgraph.core.PropertyKey;
+import org.janusgraph.core.*;
 import org.janusgraph.core.schema.JanusGraphIndex;
 import org.janusgraph.core.schema.JanusGraphManagement;
+import org.janusgraph.core.schema.RelationTypeIndex;
 import org.janusgraph.core.schema.SchemaAction;
+import org.janusgraph.diskstorage.BackendException;
+import org.janusgraph.hadoop.MapReduceIndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Float;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * RecreateWeightIndex creation for our example graph db
@@ -41,7 +43,7 @@ public class RecreateWeightIndex {
    * The main code basically instantiate its own class and call individual methods.
    * @param argv
    */
-  public static void main(String[] argv) {
+  public static void main(String[] argv) throws BackendException, ExecutionException, InterruptedException {
     // conect the graph
     RecreateWeightIndex schema = new RecreateWeightIndex(Schema.CONFIG_FILE);
 
@@ -117,15 +119,20 @@ public class RecreateWeightIndex {
     mgt.commit();
   }
 
-  private void reindex() {
+  private void reindex() throws BackendException, ExecutionException, InterruptedException {
     reindexFor(Schema.FOLLOWS, Schema.CREATED_AT);
     reindexFor(Schema.FOLLOWS, WEIGHT);
     reindexFor(Schema.POSTS, Schema.CREATED_AT);
   }
 
 
-  private void reindexFor(String label, String propertyKey){
-    LOGGER.info("Reindexing index for edge {} and property {}", label, propertyKey);
+  private void reindexFor(String label, String propertyKey) throws BackendException, ExecutionException, InterruptedException {
+    LOGGER.info("Reindexing index for edge {} and property {} using map reduce", label, propertyKey);
+
+    MapReduceIndexManagement mr = new MapReduceIndexManagement(graph);
+    RelationType relationType = mgt.getRelationType(label);
+    RelationTypeIndex relationIndex = mgt.getRelationIndex(relationType, propertyKey);
+    mr.updateIndex(relationIndex, SchemaAction.REINDEX).get();
   }
 
 
