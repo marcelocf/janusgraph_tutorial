@@ -128,7 +128,7 @@ public class RecreateWeightIndex {
 
   private void waitForIndex(String label, String propertyKey) throws InterruptedException {
     String indexName = Schema.indexName(label, propertyKey);
-    LOGGER.info("Awayting index {} to become available.", indexName);
+    LOGGER.info("Awaiting index {} to become available.", indexName);
     ((ManagementSystem)mgt).awaitGraphIndexStatus(graph, indexName).call();
   }
 

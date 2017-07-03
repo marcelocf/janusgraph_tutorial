@@ -26,7 +26,46 @@ The way to do this is:
 
 ## Delete old Index
 
+Deleting an index is just a matter of running:
+
+```java
+JanusGraphIndex index = mgt.getGraphIndex(Schema.indexName(label, propertyKey));
+mgt.updateIndex(index, SchemaAction.REMOVE_INDEX);
+```
+
+The index deletion is handled by the `updateIndex` method. Other actions can be used, plese check the
+docs and the `SchemaAction` class.
+
 ## Create new Index
+
+After this is done, you can create a new index. Previously we created mixed indexes. Now we want a vertex
+centric index, and the creation process is fairly different:
+
+```java
+EdgeLabel edgeLabel = mgt.getEdgeLabel(label);
+PropertyKey key = mgt.getPropertyKey(propertyKey);
+mgt.buildEdgeIndex(edgeLabel, Schema.indexName(label, propertyKey), Direction.BOTH, Order.decr, key);
+```
+
+Even though it is called **vertex** centric index, it is an index for edges properties. Other important
+settings are the direction (index only for incoming or outgoing vertices or both) and default order.
+
+This means you will have localized in your vertex an index of elements based on this property. And it will
+be already preordered as you wish to iterate; speed!
+
+## Await Index
+
+For good measure, after committing the management operation, let's wait for the indexes to be
+ready to use:
+
+```java
+String indexName = Schema.indexName(label, propertyKey);
+((ManagementSystem)mgt).awaitGraphIndexStatus(graph, indexName).call();
+```
+
+We need to cast it to a `ManagementSystem` instance.
+
+This operation can take a long time, so patience my old friend. Patience. :)
 
 ## Reindex
 
