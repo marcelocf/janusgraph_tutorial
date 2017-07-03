@@ -81,7 +81,7 @@ public class RecreateWeightIndex {
    */
   public RecreateWeightIndex(String configFile) {
     LOGGER.info("Connecting graph");
-    graph = null;//JanusGraphFactory.open(configFile);
+    graph = JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");
     mgt = graph.openManagement();
   }

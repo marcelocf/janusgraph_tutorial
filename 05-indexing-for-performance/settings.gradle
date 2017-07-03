@@ -1,4 +1,4 @@
-rootProject.name="04-hadoop"
+rootProject.name='05-indexing-for-performance'
 
 include ':01-schema'
 project(':01-schema').projectDir = new File(settingsDir, '../01-schema')
