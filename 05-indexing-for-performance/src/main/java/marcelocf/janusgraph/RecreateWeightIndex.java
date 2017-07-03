@@ -10,6 +10,7 @@ import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.schema.RelationTypeIndex;
 import org.janusgraph.core.schema.SchemaAction;
 import org.janusgraph.diskstorage.BackendException;
+import org.janusgraph.graphdb.database.management.ManagementSystem;
 import org.janusgraph.hadoop.MapReduceIndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,8 @@ public class RecreateWeightIndex {
     schema.deleteOldIndexes();
     schema.createNewIndexes();
     schema.commit();
-    schema.reindex();
+    schema.waitForIndexes();
+    //schema.reindex();
 
     schema.close();
   }
@@ -118,6 +120,18 @@ public class RecreateWeightIndex {
     mgt.buildEdgeIndex(edgeLabel, Schema.indexName(label, propertyKey), Direction.BOTH, Order.decr, key);
   }
 
+  private void waitForIndexes() throws InterruptedException {
+    waitForIndex(Schema.FOLLOWS, Schema.CREATED_AT);
+    waitForIndex(Schema.FOLLOWS, WEIGHT);
+    waitForIndex(Schema.POSTS, Schema.CREATED_AT);
+  }
+
+  private void waitForIndex(String label, String propertyKey) throws InterruptedException {
+    String indexName = Schema.indexName(label, propertyKey);
+    LOGGER.info("Awayting index {} to become available.", indexName);
+    ((ManagementSystem)mgt).awaitGraphIndexStatus(graph, indexName).call();
+  }
+
   private void reindex() throws BackendException, ExecutionException, InterruptedException {
     reindexFor(Schema.FOLLOWS, Schema.CREATED_AT);
     reindexFor(Schema.FOLLOWS, WEIGHT);
@@ -129,14 +143,14 @@ public class RecreateWeightIndex {
     LOGGER.info("Reindexing index for edge {} and property {} using map reduce", label, propertyKey);
 
     MapReduceIndexManagement mr = new MapReduceIndexManagement(graph);
-    RelationType relationType = mgt.getRelationType(label);
-    RelationTypeIndex relationIndex = mgt.getRelationIndex(relationType, propertyKey);
-    mr.updateIndex(relationIndex, SchemaAction.REINDEX).get();
+    JanusGraphIndex index = mgt.getGraphIndex(Schema.indexName(label, propertyKey));
+    mr.updateIndex(index, SchemaAction.REINDEX).get();
   }
 
 
   public void commit() {
     mgt.commit();
+    graph.tx().commit();
     mgt = graph.openManagement();
   }
 
@@ -145,7 +159,7 @@ public class RecreateWeightIndex {
    */
   private void close(){
     // we need to commit the Management changes or else they are not applied.
-    graph.tx().commit();
+    commit();
     graph.close();
   }
 }
