@@ -49,6 +49,7 @@ public class RecreateWeightIndex {
 
     schema.deleteOldIndexes();
     schema.createNewIndexes();
+    schema.commit();
     schema.reindex();
 
     schema.close();
@@ -72,7 +73,7 @@ public class RecreateWeightIndex {
    * The schema management is done by an instance of @{@link JanusGraphManagement}. This class can do other interesting
    * stuff, such as kicking other nodes from the cluster. I recommend reading its javadocs.
    */
-  private final JanusGraphManagement mgt;
+  private JanusGraphManagement mgt;
 
   /**
    * Initialize the graph and the graph management interface.
@@ -96,7 +97,6 @@ public class RecreateWeightIndex {
     LOGGER.info("Deleting index for edge {} and property {}", label, propertyKey);
     JanusGraphIndex index = mgt.getGraphIndex(Schema.indexName(label, propertyKey));
     mgt.updateIndex(index, SchemaAction.REMOVE_INDEX);
-    mgt.commit();
   }
 
   /**
@@ -116,7 +116,6 @@ public class RecreateWeightIndex {
     EdgeLabel edgeLabel = mgt.getEdgeLabel(label);
     PropertyKey key = mgt.getPropertyKey(propertyKey);
     mgt.buildEdgeIndex(edgeLabel, Schema.indexName(label, propertyKey), Direction.BOTH, Order.decr, key);
-    mgt.commit();
   }
 
   private void reindex() throws BackendException, ExecutionException, InterruptedException {
@@ -136,12 +135,16 @@ public class RecreateWeightIndex {
   }
 
 
+  public void commit() {
+    mgt.commit();
+    mgt = graph.openManagement();
+  }
+
   /**
    * Commit the current transaction and close the graph.
    */
   private void close(){
     // we need to commit the Management changes or else they are not applied.
-    mgt.commit();
     graph.tx().commit();
     graph.close();
   }
