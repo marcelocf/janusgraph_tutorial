@@ -71,3 +71,13 @@ applicationName = 'recreate-index'
 applicationDefaultJvmArgs = logSettings
 
 distZip.setArchiveName('05-indexing-for-performance.zip')
+
+task createSupernodesScript(type: CreateStartScripts) {
+  mainClassName="marcelocf.janusgraph.CreateSupernodes"
+  applicationName="create-supernodes"
+  outputDir = file('build/scripts')
+  classpath = jar.outputs.files + project.configurations.runtime
+  defaultJvmOpts = logSettings
+}
+
+distZip.dependsOn createSupernodesScript
