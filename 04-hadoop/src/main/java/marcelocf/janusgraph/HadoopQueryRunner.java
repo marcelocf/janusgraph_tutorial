@@ -85,6 +85,7 @@ public class HadoopQueryRunner extends QueryRunner {
         aggregate("users").
         local(
             __.outE(FOLLOWS).
+                has(CreateWeightIndex.WEIGHT).
                 order().by(CreateWeightIndex.WEIGHT, decr).
                 dedup().
                 limit(50).
