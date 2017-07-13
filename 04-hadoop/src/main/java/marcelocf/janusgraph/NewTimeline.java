@@ -19,8 +19,7 @@ public class NewTimeline {
     int runs = 10;
 
     for(int i =0; i < runs; i++) {
-      LOGGER.info("Previous NewTimeline (run {} of {})", i+1, runs);
-      LOGGER.info("New NewTimeline");
+      LOGGER.info("New timeline (run {} of {})", i+1, runs);
       q.printTimeline(q.getTimeline3(10));
     }
     q.close();
