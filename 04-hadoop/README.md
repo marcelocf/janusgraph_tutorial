@@ -182,19 +182,19 @@ Here we have 3 main programs:
 
 * **create-index:** will create the *weight* index.
 * **compute-weight:** run spark with the built-in spark
-* **timeline:** print the timeline for a specific user.
+* **old-timeline:** print the timeline for a specific user using the old script.
+* **new-timeline:** print the timeline for a specific user using the new script.
 
 Make sure to run the commands in the presented order.
-
 
 ## Results
 
 The final code ensures we return in a predictable way even if the user is following way to many users.
 
 This is, by no means, the best solution. The query actually takes a little bit longer to execute than the previous
-one for users following only a few people.
+one for users following only a few people. The advantage is when we have supernodes.
 
 Also, the weight is being indexed in a centralized index inside elasticsearch; not the most efficient way for doing this.
 
 In the next section, [05-indexing-for-performance](../05-indexing-for-performance) we will describe a way to improve the
-query time.
+new query time.

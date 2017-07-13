@@ -93,11 +93,12 @@ You could also do this outside of MapReduce.
 Well, to make things easier and test how much you have learned, do the following:
 
 1. stop gremlin-server/cassandra/elasticsearch
-2. remove your db folder.
-3. start cassandra and elasticsearch individualy.
-4. run the schema creation (section 01) code.
-5. create the index for weights (part of section 04).
-6. run this code.
-7. go back to section (02) to populate the DB.
-8. run the compute-weight code from section (04).
-9. test the timeline again to see performance difference.
+1. remove your db folder.
+1. start cassandra and elasticsearch individualy.
+1. run the schema creation (section 01) code.
+1. create the index for weights (part of section 04).
+1. run this code.
+1. go back to section (02) to populate the DB.
+1. on hadoop section, run the create-supernodes command.
+1. run the compute-weight code from section (04).
+1. now see the difference on performance on both timelines.
