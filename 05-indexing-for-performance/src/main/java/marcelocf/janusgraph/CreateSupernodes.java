@@ -41,8 +41,10 @@ public class CreateSupernodes {
   public static void main(String[] argv) throws Exception {
     CreateSupernodes loader = new CreateSupernodes(Schema.CONFIG_FILE);
 
+    LOGGER.info("Loading our users that will become supernodes");
     Vertex users[] = loader.getUsers(0, 99);
-    Vertex followedUsers[] = loader.getUsers(100, 9999);
+    LOGGER.info("Loading the other users");
+    Vertex followedUsers[] = loader.getUsers(100, 999);
     loader.commit();
     for(Vertex user: users) {
       LOGGER.info("User {} comments:", user.value(Schema.USER_NAME).toString());
@@ -105,7 +107,7 @@ public class CreateSupernodes {
     Vertex[] users = new Vertex[to - from + 1];
 
     for(int i=from; i <= to; i++){
-      users[i-1] = queryRunner.getUser("testUser" + i).next();
+      users[i-from] = queryRunner.getUser("testUser" + i).next();
     }
 
     return users;
