@@ -21,9 +21,9 @@ public class Timeline {
 
     for(int i =0; i< 10; i++) {
       LOGGER.info("Previous Timeline");
-      q.printTimeline(q.getTimeline2(100));
+      q.printTimeline(q.getTimeline2(10));
       LOGGER.info("New Timeline");
-      q.printTimeline(q.getTimeline3(100));
+      q.printTimeline(q.getTimeline3(10));
     }
     q.close();
     graph.close();
