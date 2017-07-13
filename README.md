@@ -2,9 +2,7 @@
 
 **NOTE:** it goes without saying that you need a properly configured JDK in your environment.
 
-
 This is a hands on guide for JanusGraph. It is organized in sections (each folder is an independent project with a section) and it is expected you follow each guide in order.
-
 
 ## Starging Janus Graph
 
@@ -29,7 +27,6 @@ $ cd janusgraph-0.1.0-hadoop2/
 $ ./bin/janusgraph.sh start
 ```
 
-
 The last command should output:
 
 ```
@@ -42,17 +39,13 @@ Connecting to Gremlin-Server (127.0.0.1:8182)..... OK (connected to 127.0.0.1:81
 Run gremlin.sh to connect.
 ```
 
-
 Meaning you have cassandra and elasticsearch listening on the loopback interface. This is important for the examples to work.
-
 
 If you need to clean your data:
 
 1. stop janus graph
 1. `rm -rf db`
 1. start janus graph
-
-
 
 It is also recommended that you read:
 
@@ -75,10 +68,10 @@ On this tutorial we will build the backend database of a twitter clone. The sect
 1. basic schema
 1. data loading
 1. querying
-1. indexing for performance
 1. hadoop integration
+1. indexing for performance
 
-By the end of this tutorial you should be able to design your own database backend using JanusGraph.
+By the end of this tutorial you should be able to design your own (very simple but functional) database backend using JanusGraph.
 
 ## Code
 
