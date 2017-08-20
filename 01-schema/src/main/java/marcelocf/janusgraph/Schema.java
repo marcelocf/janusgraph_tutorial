@@ -1,6 +1,15 @@
 
 package marcelocf.janusgraph;
 
+import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.thrift.InvalidRequestException;
+import org.apache.cassandra.thrift.SchemaDisagreementException;
+import org.apache.cassandra.thrift.TBinaryProtocol;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.*;
@@ -17,6 +26,10 @@ public class Schema {
   ////////////////////////
   // Static Attributes //
   //////////////////////
+  /**
+   * The keyspace of JanusGraph
+   */
+  private static final String JANUSGRAPH = "janusgraph";
 
   /**
    * It is usually good practice to output messages using a logging framework.
@@ -99,10 +112,27 @@ public class Schema {
    * @param configFile
    */
   public Schema(String configFile) {
+    try {
+      this.dropOldKeyspace();
+    } catch (Exception ex) {
+      LOGGER.info("Cannot drop keyspace janusgraph");
+    }
+
     LOGGER.info("Connecting graph");
     graph = JanusGraphFactory.open(configFile);
     LOGGER.info("Getting management");
     mgt = graph.openManagement();
+  }
+  
+  private void dropOldKeyspace() throws InvalidRequestException, SchemaDisagreementException, TException {
+    TTransport tr = new TFramedTransport(new TSocket("localhost", 9160));
+    TProtocol proto = new TBinaryProtocol(tr);
+    Cassandra.Client client = new Cassandra.Client(proto);
+    tr.open();
+
+    client.system_drop_keyspace(JANUSGRAPH);
+    LOGGER.info("DROPPED keyspace janusgraph");
+    tr.close();
   }
 
   /**
