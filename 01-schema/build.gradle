@@ -46,6 +46,9 @@ dependencies {
   compile 'org.janusgraph:janusgraph-hadoop-2:0.1.0'
   compile 'org.janusgraph:janusgraph-cassandra:0.1.0'
   compile 'org.janusgraph:janusgraph-es:0.1.0'
+  
+  // https://mvnrepository.com/artifact/org.apache.cassandra/cassandra-thrift
+  compile 'org.apache.cassandra:cassandra-thrift:2.1.13'
 }
 
 

@@ -22,3 +22,10 @@ work
 
 # vim
 **/.*.swp
+
+*.classpath
+*.project
+*.settings
+*/bin
+.DS_Store
+*.gitignore
