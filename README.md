@@ -1,3 +1,7 @@
+> *WARNING:* this is *old*. Very very old! It shouldn't work and information here is vely very wrong as of 2022. Apologies for that.
+> Will leave repo live for now for historic reasons, but yeah; please don't expect this to work anymore.
+
+
 # JanusGraph tutorial
 
 **NOTE:** it goes without saying that you need a properly configured JDK in your environment.
